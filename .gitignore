@@ -1,0 +1,14 @@
+set_api_keys.sh
+
+utils/inference.py
+pdfs/*
+json/*
+venv/
+__pycache__/
+generated_questions/*
+utils/inference.py*.env
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+
+myenv/

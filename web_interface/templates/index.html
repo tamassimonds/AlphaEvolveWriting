@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Story Preference Testing - Home{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to Story Preference Testing</h2>
+    <p>This interface allows you to compare stories from different generation batches and help validate whether the evolutionary story generation process is improving story quality.</p>
+    
+    <h3>How it works:</h3>
+    <ol>
+        <li>Choose two batches to compare</li>
+        <li>Read two randomly selected stories (one from each batch)</li>
+        <li>Select which story you prefer</li>
+        <li>View statistics to see which batches perform better</li>
+    </ol>
+</div>
+
+{% if total_preferences > 0 %}
+<div class="card">
+    <h2>Overall Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_preferences }}</div>
+            <div class="stat-label">Total Preferences</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ batches|length }}</div>
+            <div class="stat-label">Available Batches</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Available Story Batches</h2>
+    {% if batches %}
+        <div class="stats-grid">
+            {% for batch in batches %}
+                <div class="stat-card">
+                    <div class="stat-label">{{ batch.replace('_', ' ').title() }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No story batches found. Please run the story generation scripts first.</p>
+    {% endif %}
+</div>
+
+{% if batches|length >= 2 %}
+<div class="card">
+    <h2>Start Comparing Batches</h2>
+    <div class="stats-grid">
+        {% for batch1 in batches %}
+            {% for batch2 in batches %}
+                {% if batch1 != batch2 and batch1 < batch2 %}
+                    <div class="stat-card">
+                        <h4>{{ batch1.replace('_', ' ').title() }} vs {{ batch2.replace('_', ' ').title() }}</h4>
+                        {% set key = batch1 + '_vs_' + batch2 %}
+                        {% if key in batch_comparisons and batch_comparisons[key].total_comparisons > 0 %}
+                            <p>{{ batch_comparisons[key].total_comparisons }} comparisons</p>
+                            <p><strong>{{ batch1.replace('_', ' ').title() }}:</strong> {{ batch_comparisons[key].batch1_percentage }}%</p>
+                            <p><strong>{{ batch2.replace('_', ' ').title() }}:</strong> {{ batch_comparisons[key].batch2_percentage }}%</p>
+                        {% else %}
+                            <p>No comparisons yet</p>
+                        {% endif %}
+                        <br>
+                        <a href="{{ url_for('compare_batches', batch1=batch1, batch2=batch2) }}" class="btn">Compare Stories</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+    <div class="card">
+        <h2>Generate More Batches</h2>
+        <p>You need at least 2 story batches to start comparing. Please run:</p>
+        <ol>
+            <li><code>python generate_initial_batch.py</code> - Generate initial stories</li>
+            <li><code>python run_elo_tournament.py</code> - Run ELO tournament</li>
+            <li><code>python generate_next_batch.py</code> - Generate evolved stories</li>
+        </ol>
+    </div>
+{% endif %}
+
+{% if total_preferences > 0 %}
+<div class="card">
+    <p style="text-align: center; margin-top: 2rem;">
+        <a href="{{ url_for('detailed_stats') }}" class="btn btn-secondary">View Detailed Statistics</a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}

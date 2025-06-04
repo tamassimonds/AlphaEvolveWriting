@@ -1,0 +1,36 @@
+{
+  "batch_generation": {
+    "num_stories": 10,
+    "model": "gpt-4.5-preview",
+    "max_attempts": 3,
+    "initial_elo": 1200
+  },
+  "next_batch_generation": {
+    "top_stories_to_select": 5,
+    "variants_per_story": 2,
+    "model": "gpt-4.5-preview",
+    "max_attempts": 3,
+    "include_original_stories": true,
+    "variant_temperature": 1.2
+  },
+  "elo_ranking": {
+    "k_factor": 32,
+    "judge_model": "o4-mini",
+    "tournament_rounds": 50,
+    "max_concurrent_matches": 20,
+    "min_elo_difference": 0,
+    "save_match_history": true,
+    "update_rankings_after_each_round": true
+  },
+  "input_files": {
+    "prompt_file": "prompt.txt",
+    "rubric_file": "rubric.txt"
+  },
+  "output": {
+    "directory": "output",
+    "stories_file": "initial_stories.json",
+    "next_batch_file": "batch2_stories.json",
+    "elo_results_file": "elo_rankings.json",
+    "match_history_file": "match_history.json"
+  }
+}

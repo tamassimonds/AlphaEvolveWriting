@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Detailed Statistics{% endblock %}
+
+{% block header %}Preference Statistics{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Overall Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_preferences }}</div>
+            <div class="stat-label">Total Preferences</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ batch_names|length }}</div>
+            <div class="stat-label">Story Batches</div>
+        </div>
+    </div>
+</div>
+
+{% if detailed_stats %}
+<div class="card">
+    <h2>Batch vs Batch Comparisons</h2>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #dee2e6;">Comparison</th>
+                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #dee2e6;">Total Comparisons</th>
+                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #dee2e6;">Batch 1 Wins</th>
+                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #dee2e6;">Batch 2 Wins</th>
+                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #dee2e6;">Batch 1 %</th>
+                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #dee2e6;">Batch 2 %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comparison, stats in detailed_stats.items() %}
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 1rem; font-weight: 500;">{{ comparison.replace('_', ' ').title() }}</td>
+                    <td style="padding: 1rem; text-align: center;">{{ stats.total_comparisons }}</td>
+                    <td style="padding: 1rem; text-align: center;">{{ stats.batch1_wins }}</td>
+                    <td style="padding: 1rem; text-align: center;">{{ stats.batch2_wins }}</td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <span style="color: {% if stats.batch1_percentage > 50 %}#28a745{% else %}#dc3545{% endif %}; font-weight: bold;">
+                            {{ stats.batch1_percentage }}%
+                        </span>
+                    </td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <span style="color: {% if stats.batch2_percentage > 50 %}#28a745{% else %}#dc3545{% endif %}; font-weight: bold;">
+                            {{ stats.batch2_percentage }}%
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if recent_preferences %}
+<div class="card">
+    <h2>Recent Preferences (Last 20)</h2>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6;">Timestamp</th>
+                    <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6;">Comparison</th>
+                    <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6;">Preferred</th>
+                    <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6;">Story IDs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pref in recent_preferences %}
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 0.75rem; font-size: 0.9rem;">
+                        {{ pref.timestamp.split('T')[0] }} {{ pref.timestamp.split('T')[1][:8] }}
+                    </td>
+                    <td style="padding: 0.75rem;">{{ pref.batch1.replace('_', ' ').title() }} vs {{ pref.batch2.replace('_', ' ').title() }}</td>
+                    <td style="padding: 0.75rem;">
+                        <span style="background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">
+                            {% if pref.preferred_story == 'story1' %}{{ pref.batch1.replace('_', ' ').title() }}{% else %}{{ pref.batch2.replace('_', ' ').title() }}{% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">
+                        {{ pref.story1_id[:8] }} vs {{ pref.story2_id[:8] }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>How to Interpret These Statistics</h2>
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; margin: 1rem 0;">
+        <h4>Understanding the Results:</h4>
+        <ul style="margin: 1rem 0; padding-left: 2rem;">
+            <li><strong>Higher percentage = Better performance</strong> - A batch with >50% preference rate is performing better than its comparison batch</li>
+            <li><strong>Sample size matters</strong> - Results with more comparisons are more reliable</li>
+            <li><strong>Evolution validation</strong> - If later batches consistently outperform earlier ones, the evolution process is working</li>
+        </ul>
+        
+        <h4>Expected Patterns:</h4>
+        <ul style="margin: 1rem 0; padding-left: 2rem;">
+            <li><strong>batch2_stories > initial_stories</strong> - Evolved stories should be preferred over originals</li>
+            <li><strong>batch3_stories > batch2_stories</strong> - Further evolution should continue improving</li>
+            <li><strong>Variants vs Parents</strong> - Some variants should outperform their parent stories</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card" style="text-align: center;">
+    <p>
+        <a href="{{ url_for('index') }}" class="btn">Continue Testing</a>
+        <a href="#" onclick="downloadData()" class="btn btn-secondary" style="margin-left: 1rem;">Download Data (JSON)</a>
+    </p>
+</div>
+
+<script>
+function downloadData() {
+    // Create a simple data export
+    const data = {
+        total_preferences: {{ total_preferences }},
+        detailed_stats: {{ detailed_stats|tojson }},
+        recent_preferences: {{ recent_preferences|tojson }}
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'preference_statistics.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}
