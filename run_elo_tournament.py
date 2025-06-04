@@ -86,6 +86,18 @@ async def main():
             print("Need at least 2 stories to run tournament")
             return
         
+        # Extract original prompt from stories data
+        original_prompt = None
+        with open(stories_path, "r") as f:
+            stories_data = json.load(f)
+            if "stories" in stories_data and len(stories_data["stories"]) > 0:
+                original_prompt = stories_data["stories"][0].get("prompt")
+        
+        if original_prompt:
+            print(f"Using original prompt: {original_prompt[:100]}...")
+        else:
+            print("Warning: No original prompt found in stories data")
+        
         # Display initial standings
         print("\nInitial ELO Standings:")
         for i, story in enumerate(sorted(stories, key=lambda s: s.elo, reverse=True)):
@@ -108,7 +120,8 @@ async def main():
             min_elo_difference=elo_config["min_elo_difference"],
             stories_file_path=stories_path,
             update_after_each_round=elo_config["update_rankings_after_each_round"],
-            rubric_file=rubric_file
+            rubric_file=rubric_file,
+            original_prompt=original_prompt
         )
         
         # Display final standings

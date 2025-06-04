@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(python3:*)",
+      "Bash(grep:*)",
+      "Bash(chmod:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

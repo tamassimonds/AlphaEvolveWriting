@@ -9,6 +9,8 @@ import asyncio
 import json
 import os
 import uuid
+import glob
+import re
 from datetime import datetime
 from typing import List, Dict, Any
 import shutil
@@ -204,6 +206,55 @@ async def generate_single_variant(
         return None
 
 
+def find_latest_batch_file() -> str:
+    """Find the most recent batch file based on modification time."""
+    output_dir = "output"
+    
+    # Look for story batch files
+    batch_patterns = [
+        "batch*_stories.json",
+        "*stories.json"
+    ]
+    
+    all_batch_files = []
+    for pattern in batch_patterns:
+        pattern_path = os.path.join(output_dir, pattern)
+        files = glob.glob(pattern_path)
+        all_batch_files.extend(files)
+    
+    if not all_batch_files:
+        raise FileNotFoundError(f"No batch files found in {output_dir}")
+    
+    # Sort by modification time (most recent first)
+    all_batch_files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+    
+    latest_file = all_batch_files[0]
+    print(f"Found latest batch file: {os.path.basename(latest_file)}")
+    return latest_file
+
+def determine_next_batch_filename() -> str:
+    """Determine the filename for the next batch based on existing files."""
+    output_dir = "output"
+    
+    # Find all existing batch files and extract numbers
+    batch_files = glob.glob(os.path.join(output_dir, "batch*_stories.json"))
+    
+    max_batch_num = 1  # Default to batch2 if no numbered batches exist
+    
+    for file_path in batch_files:
+        filename = os.path.basename(file_path)
+        # Extract number from filename like "batch2_stories.json"
+        match = re.search(r'batch(\d+)_stories\.json', filename)
+        if match:
+            batch_num = int(match.group(1))
+            max_batch_num = max(max_batch_num, batch_num)
+    
+    next_batch_num = max_batch_num + 1
+    next_filename = f"batch{next_batch_num}_stories.json"
+    
+    print(f"Next batch will be saved as: {next_filename}")
+    return next_filename
+
 def load_config() -> Dict[str, Any]:
     """Load configuration from config.json."""
     with open("config.json", "r") as f:
@@ -347,10 +398,10 @@ async def main():
         print(f"Configuration: Top {next_batch_config['top_stories_to_select']} stories, "
               f"{next_batch_config['variants_per_story']} variants each")
         
-        # Load previous batch
-        stories_path = os.path.join(output_config["directory"], output_config["stories_file"])
-        stories = load_previous_batch(stories_path)
-        print(f"Loaded {len(stories)} stories from previous batch")
+        # Find and load the latest batch
+        latest_batch_path = find_latest_batch_file()
+        stories = load_previous_batch(latest_batch_path)
+        print(f"Loaded {len(stories)} stories from {os.path.basename(latest_batch_path)}")
         
         if len(stories) == 0:
             print("No stories found in previous batch!")
@@ -384,8 +435,9 @@ async def main():
             initial_elo=config["batch_generation"]["initial_elo"]
         )
         
-        # Save next batch
-        output_path = os.path.join(output_config["directory"], output_config["next_batch_file"])
+        # Determine next batch filename and save
+        next_batch_filename = determine_next_batch_filename()
+        output_path = os.path.join(output_config["directory"], next_batch_filename)
         save_next_batch(final_batch, output_path, next_batch_config)
         
         print(f"\nNext batch generation complete!")

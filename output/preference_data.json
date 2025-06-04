@@ -1,0 +1,26 @@
+{
+  "last_updated": "2025-06-04T12:44:10.360860",
+  "total_preferences": 2,
+  "preferences": [
+    {
+      "timestamp": "2025-06-04T12:41:07.555709",
+      "story1_id": "c3bd9809-3f7d-4d62-9abe-17f866713bb4",
+      "story2_id": "3b4920b0-ee1c-4cae-94dc-ee486dcac5ba",
+      "batch1": "batch2_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story2",
+      "preferred_batch": "initial_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T12:44:10.360753",
+      "story1_id": "ceb01563-fbd5-4bdf-9b50-d3e35cb397de",
+      "story2_id": "48bd9302-9898-4025-ad24-c94f8f3f9d9e",
+      "batch1": "batch2_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch2_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    }
+  ]
+}

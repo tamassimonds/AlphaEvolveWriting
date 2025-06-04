@@ -91,7 +91,8 @@ class EloRankingSystem:
         story1: Story,
         story2: Story,
         judge_model: str,
-        rubric_file: str = "rubric.txt"
+        rubric_file: str = "rubric.txt",
+        original_prompt: str = None
     ) -> Match:
         """
         Conduct a single match between two stories.
@@ -100,6 +101,8 @@ class EloRankingSystem:
             story1: First story to compare
             story2: Second story to compare
             judge_model: Model to use for judging
+            rubric_file: Path to the rubric file
+            original_prompt: The original prompt that generated these stories
             
         Returns:
             Match object with results and updated ratings
@@ -109,7 +112,8 @@ class EloRankingSystem:
             model_1_response=story1.piece,
             model_2_response=story2.piece,
             judge_model=judge_model,
-            rubric_file=rubric_file
+            rubric_file=rubric_file,
+            original_prompt=original_prompt
         )
         
         # Determine winner
@@ -207,7 +211,8 @@ class EloRankingSystem:
         min_elo_difference: float = 0,
         stories_file_path: str = None,
         update_after_each_round: bool = True,
-        rubric_file: str = "rubric.txt"
+        rubric_file: str = "rubric.txt",
+        original_prompt: str = None
     ) -> List[Match]:
         """
         Run a tournament with multiple rounds of matches.
@@ -220,6 +225,8 @@ class EloRankingSystem:
             min_elo_difference: Minimum ELO difference for matchmaking
             stories_file_path: Path to stories file to update after each round
             update_after_each_round: Whether to update the stories file after each round
+            rubric_file: Path to the rubric file
+            original_prompt: The original prompt that generated these stories
             
         Returns:
             List of all matches played
@@ -241,7 +248,7 @@ class EloRankingSystem:
             
             # Create tasks for parallel execution
             tasks = [
-                self.conduct_match(story1, story2, judge_model, rubric_file)
+                self.conduct_match(story1, story2, judge_model, rubric_file, original_prompt)
                 for story1, story2 in batch
             ]
             

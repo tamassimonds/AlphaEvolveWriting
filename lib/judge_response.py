@@ -7,7 +7,6 @@ based on a hardcoded evaluation rubric.
 
 from typing import Dict, Any
 from dataclasses import dataclass
-from utils.inference import generate_text
 
 
 def load_rubric(rubric_file: str = "rubric.txt") -> str:
@@ -36,7 +35,8 @@ async def judge_responses(
     model_1_response: str,
     model_2_response: str,
     judge_model: str = "gpt-4o-mini",
-    rubric_file: str = "rubric.txt"
+    rubric_file: str = "rubric.txt",
+    original_prompt: str = None
 ) -> ModelComparison:
     """
     Compare two model responses and determine which is better based on the rubric.
@@ -46,6 +46,7 @@ async def judge_responses(
         model_2_response: Second model's creative writing response
         judge_model: The model to use for evaluation
         rubric_file: Path to the rubric file
+        original_prompt: The original prompt that generated these responses (optional)
         
     Returns:
         ModelComparison object with winner and reasoning
@@ -53,8 +54,16 @@ async def judge_responses(
     
     rubric = load_rubric(rubric_file)
     
-    prompt = f"""You are an expert creative writing judge. Your task is to compare two creative writing pieces and determine which one is better based on the provided rubric.
+    prompt_section = ""
+    if original_prompt:
+        prompt_section = f"""
+## Original Writing Prompt:
+{original_prompt}
 
+"""
+
+    prompt = f"""You are an expert creative writing judge. Your task is to compare two creative writing pieces and determine which one is better based on the provided rubric.
+{prompt_section}
 ## Evaluation Rubric
 {rubric}
 
@@ -65,14 +74,15 @@ async def judge_responses(
 {model_2_response}
 
 ## Your Task:
-Carefully evaluate both responses against the rubric criteria. Consider each category and determine which response performs better overall.
+Carefully evaluate both responses against the rubric criteria{" and how well they address the original prompt" if original_prompt else ""}. Consider each category and determine which response performs better overall.
 
 ## Output Format:
 WINNER: model_1 or model_2
-REASONING: <Provide a detailed explanation of your decision, referencing specific aspects of each response and how they align with the rubric criteria. Be specific about what makes the winning response better.>
+REASONING: <Provide a detailed explanation of your decision, referencing specific aspects of each response and how they align with the rubric criteria{" and the original prompt" if original_prompt else ""}. Be specific about what makes the winning response better.>
 
 Now compare the responses and make your judgment."""
 
+    from utils.inference import generate_text
     response = await generate_text(judge_model, prompt)
     
     # Parse the response
