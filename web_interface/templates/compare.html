@@ -30,38 +30,26 @@
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
     <div class="card" style="margin-bottom: 0;">
-        <h3>Story A - {{ batch1.replace('_', ' ').title() }}</h3>
+        <h3>Story A</h3>
         <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto; margin: 1rem 0;">
             <p style="white-space: pre-wrap; line-height: 1.8;">{{ story1.piece }}</p>
         </div>
         <div style="font-size: 0.9rem; color: #666;">
             <p><strong>Model:</strong> {{ story1.model_used }}</p>
             <p><strong>ID:</strong> {{ story1.story_id[:8] }}...</p>
-            {% if story1.elo %}
-                <p><strong>ELO:</strong> {{ "%.1f"|format(story1.elo) }}</p>
-            {% endif %}
-            {% if story1.generation_type %}
-                <p><strong>Type:</strong> {{ story1.generation_type.replace('_', ' ').title() }}</p>
-            {% endif %}
         </div>
         <br>
         <button onclick="selectStory('story1')" class="btn" style="width: 100%;">I Prefer Story A</button>
     </div>
     
     <div class="card" style="margin-bottom: 0;">
-        <h3>Story B - {{ batch2.replace('_', ' ').title() }}</h3>
+        <h3>Story B</h3>
         <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto; margin: 1rem 0;">
             <p style="white-space: pre-wrap; line-height: 1.8;">{{ story2.piece }}</p>
         </div>
         <div style="font-size: 0.9rem; color: #666;">
             <p><strong>Model:</strong> {{ story2.model_used }}</p>
             <p><strong>ID:</strong> {{ story2.story_id[:8] }}...</p>
-            {% if story2.elo %}
-                <p><strong>ELO:</strong> {{ "%.1f"|format(story2.elo) }}</p>
-            {% endif %}
-            {% if story2.generation_type %}
-                <p><strong>Type:</strong> {{ story2.generation_type.replace('_', ' ').title() }}</p>
-            {% endif %}
         </div>
         <br>
         <button onclick="selectStory('story2')" class="btn" style="width: 100%;">I Prefer Story B</button>

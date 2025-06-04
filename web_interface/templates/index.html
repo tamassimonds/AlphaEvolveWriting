@@ -88,7 +88,34 @@
 <div class="card">
     <p style="text-align: center; margin-top: 2rem;">
         <a href="{{ url_for('detailed_stats') }}" class="btn btn-secondary">View Detailed Statistics</a>
+        <button onclick="resetPreferences()" class="btn" style="background-color: #dc3545; margin-left: 1rem;">Reset All Preferences</button>
     </p>
 </div>
+
+<script>
+async function resetPreferences() {
+    if (!confirm('Are you sure you want to reset all preference data? This cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/reset_preferences', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            alert('Preference data reset successfully!');
+            window.location.reload();
+        } else {
+            alert('Error resetting preferences. Please try again.');
+        }
+    } catch (error) {
+        alert('Error resetting preferences. Please try again.');
+    }
+}
+</script>
 {% endif %}
 {% endblock %}
