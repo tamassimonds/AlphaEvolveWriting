@@ -8,6 +8,9 @@ and update ratings accordingly. Stories compete in tournaments to establish rank
 import asyncio
 import json
 import random
+import gc
+import psutil
+import os
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 from dataclasses import dataclass
@@ -53,6 +56,21 @@ class EloRankingSystem:
         """
         self.k_factor = k_factor
         self.match_history: List[Match] = []
+    
+    def log_memory_usage(self, context: str = ""):
+        """Log current memory usage for debugging."""
+        try:
+            process = psutil.Process(os.getpid())
+            memory_mb = process.memory_info().rss / 1024 / 1024
+            cpu_percent = process.cpu_percent()
+            print(f"📊 {context} - Memory: {memory_mb:.1f}MB, CPU: {cpu_percent:.1f}%")
+        except Exception:
+            pass  # psutil might not be available
+    
+    def cleanup_memory(self):
+        """Force garbage collection to free memory."""
+        gc.collect()
+        print("🧹 Memory cleanup performed")
     
     def calculate_expected_score(self, rating_a: float, rating_b: float) -> float:
         """
@@ -107,14 +125,22 @@ class EloRankingSystem:
         Returns:
             Match object with results and updated ratings
         """
-        # Get judge decision
-        comparison = await judge_responses(
-            model_1_response=story1.piece,
-            model_2_response=story2.piece,
-            judge_model=judge_model,
-            rubric_file=rubric_file,
-            original_prompt=original_prompt
-        )
+        try:
+            # Get judge decision with timeout
+            comparison = await asyncio.wait_for(
+                judge_responses(
+                    model_1_response=story1.piece,
+                    model_2_response=story2.piece,
+                    judge_model=judge_model,
+                    rubric_file=rubric_file,
+                    original_prompt=original_prompt
+                ),
+                timeout=120.0  # 2 minute timeout per individual match
+            )
+        except asyncio.TimeoutError:
+            raise Exception(f"Judge timeout for match {story1.story_id[:8]} vs {story2.story_id[:8]}")
+        except Exception as e:
+            raise Exception(f"Judge error for match {story1.story_id[:8]} vs {story2.story_id[:8]}: {e}")
         
         # Determine winner
         winner_story = story1 if comparison.winner == "model_1" else story2
@@ -232,6 +258,7 @@ class EloRankingSystem:
             List of all matches played
         """
         print(f"Starting tournament with {len(stories)} stories for {num_rounds} rounds")
+        self.log_memory_usage("Tournament start")
         
         # Generate match pairs
         match_pairs = self.get_match_pairs(stories, num_rounds, min_elo_difference)
@@ -240,34 +267,70 @@ class EloRankingSystem:
         
         # Run matches in batches to control concurrency
         all_matches = []
+        total_batches = (len(match_pairs) + max_concurrent_matches - 1) // max_concurrent_matches
+        
+        print(f"🔢 Total batches to process: {total_batches}")
+        print(f"⚙️  Concurrency setting: {max_concurrent_matches} matches per batch")
         
         for i in range(0, len(match_pairs), max_concurrent_matches):
             batch = match_pairs[i:i + max_concurrent_matches]
+            batch_num = i//max_concurrent_matches + 1
             
-            print(f"Running match batch {i//max_concurrent_matches + 1} ({len(batch)} matches)")
+            print(f"🏆 Running match batch {batch_num}/{total_batches} ({len(batch)} matches)")
+            print(f"   Concurrency: {len(batch)} parallel matches")
+            self.log_memory_usage(f"Batch {batch_num} start")
             
-            # Create tasks for parallel execution
-            tasks = [
-                self.conduct_match(story1, story2, judge_model, rubric_file, original_prompt)
-                for story1, story2 in batch
-            ]
+            # Special attention to batch 4 where freezing occurs
+            if batch_num == 4:
+                print(f"   ⚠️  BATCH 4 DETECTED - Known freezing point!")
+                print(f"   🔍 Extra debugging enabled for this batch")
+                self.cleanup_memory()
+                self.log_memory_usage("Batch 4 after cleanup")
             
-            # Execute matches in parallel
-            batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            # Process results
-            for j, result in enumerate(batch_results):
-                if isinstance(result, Exception):
-                    print(f"Match {i+j+1} failed: {result}")
-                else:
-                    all_matches.append(result)
-                    match = result
-                    print(f"Match {i+j+1}: {match.winner_id[:8]} wins")
-            
-            # Update stories file after each batch if requested
-            if update_after_each_round and stories_file_path and len(all_matches) > 0:
-                self._update_stories_file(stories, stories_file_path)
-                print(f"Updated ELO rankings in {stories_file_path}")
+            try:
+                # Create tasks for parallel execution
+                tasks = [
+                    self.conduct_match(story1, story2, judge_model, rubric_file, original_prompt)
+                    for story1, story2 in batch
+                ]
+                
+                print(f"   ⏳ Executing {len(tasks)} matches in parallel...")
+                
+                # Execute matches in parallel with timeout
+                batch_results = await asyncio.wait_for(
+                    asyncio.gather(*tasks, return_exceptions=True),
+                    timeout=300.0  # 5 minute timeout per batch
+                )
+                
+                print(f"   ✅ Batch {batch_num} completed")
+                
+                # Process results
+                successful_matches = 0
+                for j, result in enumerate(batch_results):
+                    if isinstance(result, Exception):
+                        print(f"   ❌ Match {i+j+1} failed: {result}")
+                    else:
+                        all_matches.append(result)
+                        match = result
+                        print(f"   🎯 Match {i+j+1}: {match.winner_id[:8]} wins")
+                        successful_matches += 1
+                
+                print(f"   📊 Batch {batch_num} summary: {successful_matches}/{len(batch)} matches successful")
+                
+                # Update stories file after each batch if requested
+                if update_after_each_round and stories_file_path and len(all_matches) > 0:
+                    print(f"   💾 Updating ELO rankings...")
+                    self._update_stories_file(stories, stories_file_path)
+                    print(f"   ✅ Updated ELO rankings in {stories_file_path}")
+                    
+            except asyncio.TimeoutError:
+                print(f"   ⏰ Batch {batch_num} timed out after 5 minutes")
+                print(f"   💡 Consider reducing max_concurrent_matches in config")
+                break
+            except Exception as e:
+                print(f"   💥 Batch {batch_num} failed with error: {e}")
+                print(f"   🔄 Continuing with next batch...")
+                continue
         
         print(f"Tournament complete! {len(all_matches)} matches played")
         return all_matches

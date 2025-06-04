@@ -1,14 +1,14 @@
 {
   "batch_generation": {
     "num_stories": 30,
-    "model": "gpt-4o",
+    "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
     "max_attempts": 3,
     "initial_elo": 1200
   },
   "next_batch_generation": {
     "top_stories_to_select": 10,
     "variants_per_story": 3,
-    "model": "gpt-4o",
+    "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
     "max_attempts": 3,
     "include_original_stories": true,
     "variant_temperature": 1.2

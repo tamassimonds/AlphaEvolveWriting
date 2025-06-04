@@ -408,11 +408,10 @@ async def generate_story_variant(
     original_prompt: str,
     model: str = "gpt-4",
     rubric_file: str = "rubric.txt",
-    temperature: float = 1.2,
-    use_random_mission: bool = True
+    temperature: float = 1.2
 ) -> str:
     """
-    Generate a variant of an existing story while maintaining the core narrative.
+    Generate a variant of an existing story with moderate improvements.
     
     Args:
         original_story: The original story to create a variant from
@@ -420,56 +419,47 @@ async def generate_story_variant(
         model: The model to use for generation
         rubric_file: Path to the rubric file
         temperature: Temperature for more creative variations
-        use_random_mission: Whether to use a random mission set for creative goals
         
     Returns:
-        A new story variant as a string
+        A new story variant as a string with moderate improvements
     """
     
     rubric = load_rubric(rubric_file)
-    
-    # Get random mission if enabled
-    mission_section = ""
-    
-    if use_random_mission:
-        mission = get_random_mission()
-        mission_goals = "\n".join(f"• {goal}" for goal in mission["goals"])
-        mission_section = f"""
 
-## Creative Mission: {mission["description"]}
-Your specific creative goals for this variant:
-{mission_goals}
-"""
-
-    prompt = f"""You are tasked with creating a creative variant of an existing story. The goal is to maintain the core narrative elements while exploring different approaches, perspectives, or narrative techniques.
+    prompt = f"""You are tasked with creating an improved variant of an existing story. Make meaningful improvements while keeping the core story and characters recognizable.
 
 ## Original Prompt:
 {original_prompt}
 
 ## Original Story:
 {original_story}
-{mission_section}
 
 ## Evaluation Rubric:
 {rubric}
 
 ## Your Task:
-Create a new variant of this story that:
-- Maintains the core premise and key narrative elements
-- Explores different stylistic approaches, perspectives, or narrative techniques
-- Could be told from a different character's viewpoint
-- Might emphasize different themes or emotional beats
-- Uses different pacing, structure, or descriptive language
-- Still targets the evaluation rubric for quality{" and your creative mission" if use_random_mission else ""}
+Create a variant that makes MODERATE improvements such as:
+- Strengthen the ending to be more satisfying or impactful
+- Improve dialogue to be more natural and revealing
+- Enhance character development and motivations
+- Refine plot elements and story structure
+- Add or improve key scenes that advance the story
+- Better word choices and more evocative descriptions
+- Improve pacing and narrative flow
+- Enhance the emotional impact of key moments
+- Strengthen the story's theme or message
+- Add small details that enrich the world or characters
 
 ## Guidelines:
-- Keep the fundamental story concept intact
-- Feel free to change narrative perspective, tense, or style
-- Explore different character dynamics or emotional emphasis
-- Vary the pacing, structure, or descriptive detail
-- Maintain high quality according to the rubric criteria
+- Keep the core premise, main characters, and setting the same
+- You can modify 20-30% of the story for improvements
+- Focus on making the story more engaging and well-crafted
+- Improve weak areas while preserving what works well
+- Enhance rather than completely change major story elements
+- Make the story more polished and compelling overall
+- Ensure all changes serve to improve the reader experience
 
-Write only the story variant - no analysis or commentary needed."""
+Write only the improved story variant - no analysis or commentary needed."""
 
     from utils.inference import generate_text
     response = await generate_text(model, prompt, temperature=temperature)
