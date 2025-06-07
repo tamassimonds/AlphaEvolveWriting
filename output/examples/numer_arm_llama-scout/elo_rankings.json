@@ -1,0 +1,728 @@
+{
+  "tournament_completed_at": "2025-06-05T11:16:13.340894",
+  "total_matches": 398,
+  "leaderboard": [
+    {
+      "rank": 1,
+      "story_id": "5936effa-6a72-4784-9cf8-cab38d25f9f8",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1423.03,
+      "matches_played": 20,
+      "wins": 20,
+      "losses": 0,
+      "win_rate": 1.0
+    },
+    {
+      "rank": 2,
+      "story_id": "8dccaf7d-6753-4a0d-8639-4ded370a0be5",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1385.47,
+      "matches_played": 20,
+      "wins": 19,
+      "losses": 1,
+      "win_rate": 0.95
+    },
+    {
+      "rank": 3,
+      "story_id": "aa759802-225e-466f-b727-4e10346294a2",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1351.64,
+      "matches_played": 20,
+      "wins": 17,
+      "losses": 3,
+      "win_rate": 0.85
+    },
+    {
+      "rank": 4,
+      "story_id": "10baaedd-4be8-4f8d-815b-36f6d422c22f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1351.11,
+      "matches_played": 20,
+      "wins": 17,
+      "losses": 3,
+      "win_rate": 0.85
+    },
+    {
+      "rank": 5,
+      "story_id": "ab852296-b0c9-4d3c-8b07-de8902a35b09",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1349.59,
+      "matches_played": 19,
+      "wins": 17,
+      "losses": 2,
+      "win_rate": 0.895
+    },
+    {
+      "rank": 6,
+      "story_id": "df306e59-d039-497d-ade4-b284f3c7b4a1",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1315.05,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 7,
+      "story_id": "7b0c840a-3839-48b4-a5e5-1c0667711c6f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1314.88,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 8,
+      "story_id": "4d6bec06-fb90-46aa-bd32-48cfda1cb28a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1304.38,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 9,
+      "story_id": "5ea2186d-b701-4762-aea4-452e8a941a47",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1274.81,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 10,
+      "story_id": "9f21f5bb-55ab-472c-a6bf-ef333d2c9b5a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1259.86,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 11,
+      "story_id": "83df45b2-bc12-4903-87a9-c07ff2d9f89a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1255.13,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 12,
+      "story_id": "be4ddadb-1c87-47b4-802e-c6c3b003f48c",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1245.48,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 13,
+      "story_id": "1a258ceb-b463-46c7-be82-10447a6c95be",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1238.32,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 14,
+      "story_id": "e701fc06-0251-4114-a87b-d6272bd26f62",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1236.65,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 15,
+      "story_id": "d0a8b1bc-a405-4479-b68c-96098346599b",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1236.51,
+      "matches_played": 18,
+      "wins": 11,
+      "losses": 7,
+      "win_rate": 0.611
+    },
+    {
+      "rank": 16,
+      "story_id": "82750956-051e-4f19-bbab-f0371df80024",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1219.74,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 17,
+      "story_id": "ee33d2bd-2fdc-413a-898e-929a4d5097dc",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1218.57,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 18,
+      "story_id": "1e4ca71d-ca9b-4f71-bb3f-ee1876d2e506",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1208.0,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 19,
+      "story_id": "502ff24d-ad42-4d45-b2cf-f50e5f588623",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1202.56,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 20,
+      "story_id": "7caefb2f-15f0-4116-b381-4b58560d668d",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1194.21,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 21,
+      "story_id": "2887a4a2-02c3-4c47-8140-7812856512d4",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1189.67,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 22,
+      "story_id": "d4b36bff-ea7a-41d9-be45-dfcd1cf56e0b",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1185.35,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 23,
+      "story_id": "fb095e01-05e0-4d9d-a6bd-003481888e93",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1183.41,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 24,
+      "story_id": "76d64227-f5a7-432d-9280-7aa74f2e1d38",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1181.95,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 25,
+      "story_id": "afd16525-09d4-4499-ab5c-2b65de75fdfe",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1180.84,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 26,
+      "story_id": "93daf434-5118-4aac-ae17-e3bf4357e89e",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1170.83,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 27,
+      "story_id": "4e897c11-52b2-46d7-98e4-70b0be6b8448",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1170.35,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 28,
+      "story_id": "6c49500c-c2b2-4b90-ab38-e58e52a23587",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1162.04,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 29,
+      "story_id": "546cb7f4-df6e-4025-bf57-b19f9e79d867",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1146.67,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12,
+      "win_rate": 0.4
+    },
+    {
+      "rank": 30,
+      "story_id": "fc87de73-f9a3-4e15-8488-be8e14c74e9d",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1131.56,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13,
+      "win_rate": 0.35
+    },
+    {
+      "rank": 31,
+      "story_id": "19254cd7-1976-4260-92d7-9c72d4850627",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1130.35,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14,
+      "win_rate": 0.3
+    },
+    {
+      "rank": 32,
+      "story_id": "97330b05-0933-4bf8-b56b-081e231f2a9f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1130.14,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14,
+      "win_rate": 0.3
+    },
+    {
+      "rank": 33,
+      "story_id": "3f057493-33d8-4856-a880-a2dd538b3428",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1114.29,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15,
+      "win_rate": 0.25
+    },
+    {
+      "rank": 34,
+      "story_id": "2673bf5f-0b5b-49a3-a9a3-1976ac6daf02",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1101.13,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14,
+      "win_rate": 0.3
+    },
+    {
+      "rank": 35,
+      "story_id": "865df6a6-a994-4b3a-969e-bd7e9866ad95",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1076.22,
+      "matches_played": 20,
+      "wins": 4,
+      "losses": 16,
+      "win_rate": 0.2
+    },
+    {
+      "rank": 36,
+      "story_id": "3cd8df0b-9cfb-42ce-8208-0a814a7573c2",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1047.36,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17,
+      "win_rate": 0.15
+    },
+    {
+      "rank": 37,
+      "story_id": "38539937-9296-475a-a084-073c88e3fe49",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1044.72,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17,
+      "win_rate": 0.15
+    },
+    {
+      "rank": 38,
+      "story_id": "4ea15c33-6e10-4f13-8f22-026f1214c371",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1043.51,
+      "matches_played": 19,
+      "wins": 2,
+      "losses": 17,
+      "win_rate": 0.105
+    },
+    {
+      "rank": 39,
+      "story_id": "78eeb576-8a32-4046-b7d8-22d7fafad465",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1016.85,
+      "matches_played": 20,
+      "wins": 2,
+      "losses": 18,
+      "win_rate": 0.1
+    },
+    {
+      "rank": 40,
+      "story_id": "cc773cbc-ed0d-44d5-9e3e-91f62c216880",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1007.79,
+      "matches_played": 20,
+      "wins": 1,
+      "losses": 19,
+      "win_rate": 0.05
+    }
+  ],
+  "stories": [
+    {
+      "story_id": "8dccaf7d-6753-4a0d-8639-4ded370a0be5",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1385.4722561649476,
+      "matches_played": 20,
+      "wins": 19,
+      "losses": 1
+    },
+    {
+      "story_id": "be4ddadb-1c87-47b4-802e-c6c3b003f48c",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1245.4828184275764,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "7b0c840a-3839-48b4-a5e5-1c0667711c6f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1314.8785143413418,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "e701fc06-0251-4114-a87b-d6272bd26f62",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1236.649512961353,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "afd16525-09d4-4499-ab5c-2b65de75fdfe",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1180.844390212789,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "4d6bec06-fb90-46aa-bd32-48cfda1cb28a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1304.384746179055,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "3f057493-33d8-4856-a880-a2dd538b3428",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1114.2850728388173,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15
+    },
+    {
+      "story_id": "502ff24d-ad42-4d45-b2cf-f50e5f588623",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1202.5630573973526,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "83df45b2-bc12-4903-87a9-c07ff2d9f89a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1255.1337994025955,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "6c49500c-c2b2-4b90-ab38-e58e52a23587",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1162.038534495897,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "19254cd7-1976-4260-92d7-9c72d4850627",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1130.3489938582175,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14
+    },
+    {
+      "story_id": "5ea2186d-b701-4762-aea4-452e8a941a47",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1274.8076083905212,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "aa759802-225e-466f-b727-4e10346294a2",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1351.6408608637244,
+      "matches_played": 20,
+      "wins": 17,
+      "losses": 3
+    },
+    {
+      "story_id": "ee33d2bd-2fdc-413a-898e-929a4d5097dc",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1218.5650548479562,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "fb095e01-05e0-4d9d-a6bd-003481888e93",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1183.4070375957392,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "9f21f5bb-55ab-472c-a6bf-ef333d2c9b5a",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1259.862765718663,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "d4b36bff-ea7a-41d9-be45-dfcd1cf56e0b",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1185.3469732089964,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "7caefb2f-15f0-4116-b381-4b58560d668d",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1194.2099241460683,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "d0a8b1bc-a405-4479-b68c-96098346599b",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1236.5089313161877,
+      "matches_played": 18,
+      "wins": 11,
+      "losses": 7
+    },
+    {
+      "story_id": "865df6a6-a994-4b3a-969e-bd7e9866ad95",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1076.2151644491871,
+      "matches_played": 20,
+      "wins": 4,
+      "losses": 16
+    },
+    {
+      "story_id": "78eeb576-8a32-4046-b7d8-22d7fafad465",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1016.850882550844,
+      "matches_played": 20,
+      "wins": 2,
+      "losses": 18
+    },
+    {
+      "story_id": "4ea15c33-6e10-4f13-8f22-026f1214c371",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1043.5096687645255,
+      "matches_played": 19,
+      "wins": 2,
+      "losses": 17
+    },
+    {
+      "story_id": "fc87de73-f9a3-4e15-8488-be8e14c74e9d",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1131.5604967766978,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13
+    },
+    {
+      "story_id": "3cd8df0b-9cfb-42ce-8208-0a814a7573c2",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1047.3550151907964,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17
+    },
+    {
+      "story_id": "38539937-9296-475a-a084-073c88e3fe49",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1044.716104071402,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17
+    },
+    {
+      "story_id": "df306e59-d039-497d-ade4-b284f3c7b4a1",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1315.0549732451132,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "97330b05-0933-4bf8-b56b-081e231f2a9f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1130.1389787044875,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14
+    },
+    {
+      "story_id": "1a258ceb-b463-46c7-be82-10447a6c95be",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1238.3154561206038,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "76d64227-f5a7-432d-9280-7aa74f2e1d38",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1181.9484042745592,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    },
+    {
+      "story_id": "546cb7f4-df6e-4025-bf57-b19f9e79d867",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1146.6678411836401,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12
+    },
+    {
+      "story_id": "2887a4a2-02c3-4c47-8140-7812856512d4",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1189.6692441289745,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    },
+    {
+      "story_id": "93daf434-5118-4aac-ae17-e3bf4357e89e",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1170.8254644638607,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "1e4ca71d-ca9b-4f71-bb3f-ee1876d2e506",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1208.0026772390747,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    },
+    {
+      "story_id": "82750956-051e-4f19-bbab-f0371df80024",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1219.7437950771669,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "5936effa-6a72-4784-9cf8-cab38d25f9f8",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1423.0274821624766,
+      "matches_played": 20,
+      "wins": 20,
+      "losses": 0
+    },
+    {
+      "story_id": "10baaedd-4be8-4f8d-815b-36f6d422c22f",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1351.1087301214425,
+      "matches_played": 20,
+      "wins": 17,
+      "losses": 3
+    },
+    {
+      "story_id": "ab852296-b0c9-4d3c-8b07-de8902a35b09",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1349.5870368186218,
+      "matches_played": 19,
+      "wins": 17,
+      "losses": 2
+    },
+    {
+      "story_id": "4e897c11-52b2-46d7-98e4-70b0be6b8448",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1170.3508428470473,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "2673bf5f-0b5b-49a3-a9a3-1976ac6daf02",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1101.133782415037,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14
+    },
+    {
+      "story_id": "cc773cbc-ed0d-44d5-9e3e-91f62c216880",
+      "model_used": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+      "elo": 1007.787107026643,
+      "matches_played": 20,
+      "wins": 1,
+      "losses": 19
+    }
+  ]
+}

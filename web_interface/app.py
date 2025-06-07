@@ -23,6 +23,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 story_batches = {}
 preference_data = []
 current_comparison = None
+judge_test_data = []
+current_judge_test = None
 
 def load_all_batches() -> Dict[str, List[Dict[str, Any]]]:
     """Load all story batch files from the output directory."""
@@ -168,6 +170,108 @@ def load_preferences() -> None:
         preference_data = []
         print("No existing preference data found")
 
+def load_match_history() -> List[Dict[str, Any]]:
+    """Load match history from the ELO tournament."""
+    try:
+        with open("../output/match_history.json", "r") as f:
+            data = json.load(f)
+        
+        if isinstance(data, dict) and "matches" in data:
+            return data["matches"]
+        elif isinstance(data, list):
+            return data
+        else:
+            return []
+    except FileNotFoundError:
+        return []
+
+def load_judge_test_data() -> None:
+    """Load existing judge test data if available."""
+    global judge_test_data
+    
+    try:
+        with open("../output/judge_test_data.json", "r") as f:
+            data = json.load(f)
+        
+        if isinstance(data, dict) and "tests" in data:
+            judge_test_data = data["tests"]
+        elif isinstance(data, list):
+            judge_test_data = data
+        else:
+            judge_test_data = []
+            
+        print(f"Loaded {len(judge_test_data)} existing judge tests")
+    except FileNotFoundError:
+        judge_test_data = []
+        print("No existing judge test data found")
+
+def save_judge_test(user_prediction: str, llm_winner: str, story1_id: str, story2_id: str, user_session: str) -> None:
+    """Save a judge test result."""
+    test_result = {
+        "timestamp": datetime.now().isoformat(),
+        "story1_id": story1_id,
+        "story2_id": story2_id,
+        "user_prediction": user_prediction,  # "story1" or "story2"
+        "llm_winner": llm_winner,  # "story1" or "story2"
+        "correct": user_prediction == llm_winner,
+        "user_session": user_session
+    }
+    
+    judge_test_data.append(test_result)
+    
+    # Ensure output directory exists
+    os.makedirs("../output", exist_ok=True)
+    
+    # Save to file with metadata
+    judge_test_file_data = {
+        "last_updated": datetime.now().isoformat(),
+        "total_tests": len(judge_test_data),
+        "correct_predictions": sum(1 for t in judge_test_data if t["correct"]),
+        "accuracy_percentage": round((sum(1 for t in judge_test_data if t["correct"]) / len(judge_test_data) * 100), 1) if judge_test_data else 0,
+        "tests": judge_test_data
+    }
+    
+    with open("../output/judge_test_data.json", "w") as f:
+        json.dump(judge_test_file_data, f, indent=2, ensure_ascii=False)
+
+def get_random_match_for_testing() -> Tuple[Dict[str, Any], Dict[str, Any], str, str]:
+    """Get a random match from match history for judge testing."""
+    matches = load_match_history()
+    
+    if not matches:
+        return None, None, None, None
+    
+    # Get a random match
+    match = random.choice(matches)
+    
+    story1_id = match["story1_id"]
+    story2_id = match["story2_id"]
+    winner_id = match["winner_id"]
+    
+    # Find the actual stories
+    story1 = None
+    story2 = None
+    
+    for batch_name, stories in story_batches.items():
+        for story in stories:
+            if story["story_id"] == story1_id:
+                story1 = story
+            elif story["story_id"] == story2_id:
+                story2 = story
+    
+    if not story1 or not story2:
+        return None, None, None, None
+    
+    # Determine which story won based on winner_id
+    if winner_id == story1_id:
+        llm_winner_formatted = "story1"
+    elif winner_id == story2_id:
+        llm_winner_formatted = "story2"
+    else:
+        return None, None, None, None
+    
+    return story1, story2, llm_winner_formatted, match
+
 def calculate_batch_stats(batch1_name: str, batch2_name: str) -> Dict[str, Any]:
     """Calculate preference statistics between two batches."""
     relevant_prefs = [
@@ -216,10 +320,17 @@ def index():
                 key = f"{batch1}_vs_{batch2}"
                 batch_comparisons[key] = calculate_batch_stats(batch1, batch2)
     
+    # Calculate judge test accuracy
+    total_judge_tests = len(judge_test_data)
+    correct_judge_tests = sum(1 for t in judge_test_data if t["correct"])
+    judge_accuracy = round((correct_judge_tests / total_judge_tests * 100), 1) if total_judge_tests > 0 else 0
+    
     return render_template('index.html', 
                          batches=batch_names, 
                          total_preferences=total_preferences,
-                         batch_comparisons=batch_comparisons)
+                         batch_comparisons=batch_comparisons,
+                         total_judge_tests=total_judge_tests,
+                         judge_accuracy=judge_accuracy)
 
 @app.route('/compare/<batch1>/<batch2>')
 def compare_batches(batch1: str, batch2: str):
@@ -346,27 +457,95 @@ def reset_preferences():
 
 @app.route('/stats')
 def detailed_stats():
-    """Show detailed statistics about all preferences."""
-    # Overall stats
-    total_prefs = len(preference_data)
+    """Redirect to index - stats only saved to JSON files."""
+    return redirect(url_for('index'))
+
+@app.route('/judge_test')
+def judge_test():
+    """Test yourself against the LLM judge."""
+    global current_judge_test
     
-    # Batch vs batch breakdown
-    batch_names = list(story_batches.keys())
-    detailed_stats = {}
+    story1, story2, llm_winner, match_data = get_random_match_for_testing()
     
-    for i, batch1 in enumerate(batch_names):
-        for batch2 in batch_names[i+1:]:
-            key = f"{batch1} vs {batch2}"
-            detailed_stats[key] = calculate_batch_stats(batch1, batch2)
+    if not story1 or not story2:
+        return "No match history available for testing", 404
     
-    # Recent preferences
-    recent_prefs = sorted(preference_data, key=lambda x: x['timestamp'], reverse=True)[:20]
+    # Randomly swap stories to avoid bias
+    swap_stories = random.choice([True, False])
+    if swap_stories:
+        story1, story2 = story2, story1
+        # Adjust LLM winner accordingly
+        if llm_winner == "story1":
+            llm_winner = "story2"
+        elif llm_winner == "story2":
+            llm_winner = "story1"
     
-    return render_template('stats.html',
-                         total_preferences=total_prefs,
-                         detailed_stats=detailed_stats,
-                         recent_preferences=recent_prefs,
-                         batch_names=batch_names)
+    # Store current test for submission
+    current_judge_test = {
+        "story1": story1,
+        "story2": story2,
+        "llm_winner": llm_winner,
+        "match_data": match_data
+    }
+    
+    # Calculate current accuracy stats
+    total_tests = len(judge_test_data)
+    correct_tests = sum(1 for t in judge_test_data if t["correct"])
+    accuracy = round((correct_tests / total_tests * 100), 1) if total_tests > 0 else 0
+    
+    return render_template('judge_test.html',
+                         story1=story1,
+                         story2=story2,
+                         total_tests=total_tests,
+                         correct_tests=correct_tests,
+                         accuracy=accuracy)
+
+@app.route('/submit_judge_test', methods=['POST'])
+def submit_judge_test():
+    """Submit a judge test prediction."""
+    global current_judge_test
+    
+    try:
+        if not current_judge_test:
+            return jsonify({"error": "No active judge test"}), 400
+        
+        # Handle both JSON and form data
+        if request.is_json:
+            user_prediction = request.json.get('predicted_winner')
+        else:
+            user_prediction = request.form.get('predicted_winner')
+            
+        if user_prediction not in ['story1', 'story2']:
+            return jsonify({"error": "Invalid prediction"}), 400
+        
+        # Generate a simple user session ID
+        user_session = request.headers.get('User-Agent', 'unknown')[:50]
+        
+        llm_winner = current_judge_test["llm_winner"]
+        
+        # Save the test result
+        save_judge_test(
+            user_prediction=user_prediction,
+            llm_winner=llm_winner,
+            story1_id=current_judge_test["story1"]["story_id"],
+            story2_id=current_judge_test["story2"]["story_id"],
+            user_session=user_session
+        )
+        
+        # Return result
+        correct = user_prediction == llm_winner
+        
+        return jsonify({
+            "success": True,
+            "correct": correct,
+            "user_prediction": user_prediction,
+            "llm_winner": llm_winner,
+            "explanation": "Correct! You matched the LLM judge." if correct else f"Incorrect. The LLM judge preferred {'Story A' if llm_winner == 'story1' else 'Story B'}."
+        })
+        
+    except Exception as e:
+        print(f"Error in submit_judge_test: {e}")
+        return jsonify({"error": "Server error"}), 500
 
 if __name__ == '__main__':
     print("Loading story batches...")
@@ -379,6 +558,7 @@ if __name__ == '__main__':
     print(f"Loaded {len(story_batches)} batches: {list(story_batches.keys())}")
     
     load_preferences()
+    load_judge_test_data()
     
     print("Starting web server...")
     print("Visit http://localhost:8080 to use the preference testing interface")

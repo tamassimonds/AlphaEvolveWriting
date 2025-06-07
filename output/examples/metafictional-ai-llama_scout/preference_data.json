@@ -1,0 +1,116 @@
+{
+  "last_updated": "2025-06-04T16:51:45.501706",
+  "total_preferences": 11,
+  "preferences": [
+    {
+      "timestamp": "2025-06-04T16:23:36.498765",
+      "story1_id": "04863035-c5cd-41d8-ba3c-211359e00478",
+      "story2_id": "d67b9d25-2df5-42ef-acb1-1a62eada2be4",
+      "batch1": "initial_stories",
+      "batch2": "batch5_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "initial_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:37:22.839132",
+      "story1_id": "7f8e83c5-3d34-440c-8049-896c77d5a16e",
+      "story2_id": "27c7c8b5-dcc4-45da-bbb7-7f3bd8dd6a9f",
+      "batch1": "batch3_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch3_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:38:45.215309",
+      "story1_id": "9a86b869-a38b-4804-9b81-e8f643ba918c",
+      "story2_id": "f83b450f-b91b-4c9a-b2e4-a84c20286b45",
+      "batch1": "batch3_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story2",
+      "preferred_batch": "initial_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:40:57.928480",
+      "story1_id": "356cd323-8295-4045-a2be-2e5552614fde",
+      "story2_id": "0a589932-2bcf-4b23-89d8-b694e535edce",
+      "batch1": "batch3_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch3_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:43:23.141476",
+      "story1_id": "f74f335b-76bf-4328-9d8c-c74bc81dfe8b",
+      "story2_id": "45f880c0-14a8-4295-a33e-9ec279fede2d",
+      "batch1": "initial_stories",
+      "batch2": "batch3_stories",
+      "preferred_story": "story2",
+      "preferred_batch": "batch3_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:44:17.145635",
+      "story1_id": "3da39d38-33e4-4827-9df1-11b0cf193348",
+      "story2_id": "0a589932-2bcf-4b23-89d8-b694e535edce",
+      "batch1": "initial_stories",
+      "batch2": "batch3_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "initial_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:45:29.145037",
+      "story1_id": "996ce95d-33d0-49fa-a33b-b716c49c1a79",
+      "story2_id": "5bd02bf7-fd7d-419c-a8c0-8f31f9ebda10",
+      "batch1": "batch4_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch4_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:46:51.600809",
+      "story1_id": "3a35edc4-259d-471d-8547-1c0aaff0d924",
+      "story2_id": "996ce95d-33d0-49fa-a33b-b716c49c1a79",
+      "batch1": "batch4_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch4_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:50:27.711554",
+      "story1_id": "a8942f3d-987b-4103-91b6-8f1bcdd15322",
+      "story2_id": "34da3c64-7452-45a5-b02f-d1270548f830",
+      "batch1": "batch5_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch5_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:51:28.642366",
+      "story1_id": "68e8560a-88f5-435b-91fb-e58b72aee623",
+      "story2_id": "9a86b869-a38b-4804-9b81-e8f643ba918c",
+      "batch1": "batch5_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch5_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    },
+    {
+      "timestamp": "2025-06-04T16:51:45.501497",
+      "story1_id": "52313936-6a7d-44d4-808b-e22353482228",
+      "story2_id": "b19db4bd-d9db-4f3f-9653-cbfc7db9b8b2",
+      "batch1": "batch5_stories",
+      "batch2": "initial_stories",
+      "preferred_story": "story1",
+      "preferred_batch": "batch5_stories",
+      "user_session": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap"
+    }
+  ]
+}

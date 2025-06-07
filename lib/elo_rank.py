@@ -126,11 +126,21 @@ class EloRankingSystem:
             Match object with results and updated ratings
         """
         try:
+            # Randomize order to avoid judge bias toward first position
+            if random.choice([True, False]):
+                # Normal order
+                first_story, second_story = story1, story2
+                is_swapped = False
+            else:
+                # Swapped order
+                first_story, second_story = story2, story1
+                is_swapped = True
+            
             # Get judge decision with timeout
             comparison = await asyncio.wait_for(
                 judge_responses(
-                    model_1_response=story1.piece,
-                    model_2_response=story2.piece,
+                    model_1_response=first_story.piece,
+                    model_2_response=second_story.piece,
                     judge_model=judge_model,
                     rubric_file=rubric_file,
                     original_prompt=original_prompt
@@ -142,9 +152,15 @@ class EloRankingSystem:
         except Exception as e:
             raise Exception(f"Judge error for match {story1.story_id[:8]} vs {story2.story_id[:8]}: {e}")
         
-        # Determine winner
-        winner_story = story1 if comparison.winner == "model_1" else story2
-        loser_story = story2 if comparison.winner == "model_1" else story1
+        # Determine winner, accounting for potential order swap
+        if is_swapped:
+            # If order was swapped, model_1 actually refers to story2, model_2 to story1
+            winner_story = story2 if comparison.winner == "model_1" else story1
+            loser_story = story1 if comparison.winner == "model_1" else story2
+        else:
+            # Normal order: model_1 refers to story1, model_2 to story2
+            winner_story = story1 if comparison.winner == "model_1" else story2
+            loser_story = story2 if comparison.winner == "model_1" else story1
         
         # Calculate new ratings
         new_winner_rating, new_loser_rating = self.update_ratings(
@@ -282,8 +298,7 @@ class EloRankingSystem:
             
             # Special attention to batch 4 where freezing occurs
             if batch_num == 4:
-                print(f"   ⚠️  BATCH 4 DETECTED - Known freezing point!")
-                print(f"   🔍 Extra debugging enabled for this batch")
+           
                 self.cleanup_memory()
                 self.log_memory_usage("Batch 4 after cleanup")
             

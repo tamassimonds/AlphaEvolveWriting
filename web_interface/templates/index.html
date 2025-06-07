@@ -9,20 +9,31 @@
     
     <h3>How it works:</h3>
     <ol>
-        <li>Choose two batches to compare</li>
-        <li>Read two randomly selected stories (one from each batch)</li>
-        <li>Select which story you prefer</li>
-        <li>View statistics to see which batches perform better</li>
+        <li><strong>Preference Testing:</strong> Compare stories from different batches and track your preferences</li>
+        <li><strong>Judge Testing:</strong> Predict which story the LLM judge would prefer and test your accuracy</li>
+        <li>Statistics are saved to JSON files for analysis</li>
     </ol>
+    
+    <div style="text-align: center; margin: 1.5rem 0;">
+        <a href="{{ url_for('judge_test') }}" class="btn" style="background-color: #17a2b8; margin-right: 1rem;">🧠 Test Against LLM Judge</a>
+    </div>
 </div>
 
-{% if total_preferences > 0 %}
+{% if total_preferences > 0 or total_judge_tests > 0 %}
 <div class="card">
     <h2>Overall Statistics</h2>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number">{{ total_preferences }}</div>
-            <div class="stat-label">Total Preferences</div>
+            <div class="stat-label">Preference Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_judge_tests }}</div>
+            <div class="stat-label">Judge Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ judge_accuracy }}%</div>
+            <div class="stat-label">Judge Accuracy</div>
         </div>
         <div class="stat-card">
             <div class="stat-number">{{ batches|length }}</div>
@@ -58,9 +69,7 @@
                         <h4>{{ batch1.replace('_', ' ').title() }} vs {{ batch2.replace('_', ' ').title() }}</h4>
                         {% set key = batch1 + '_vs_' + batch2 %}
                         {% if key in batch_comparisons and batch_comparisons[key].total_comparisons > 0 %}
-                            <p>{{ batch_comparisons[key].total_comparisons }} comparisons</p>
-                            <p><strong>{{ batch1.replace('_', ' ').title() }}:</strong> {{ batch_comparisons[key].batch1_percentage }}%</p>
-                            <p><strong>{{ batch2.replace('_', ' ').title() }}:</strong> {{ batch_comparisons[key].batch2_percentage }}%</p>
+                            <p>{{ batch_comparisons[key].total_comparisons }} comparisons completed</p>
                         {% else %}
                             <p>No comparisons yet</p>
                         {% endif %}
@@ -87,8 +96,7 @@
 {% if total_preferences > 0 %}
 <div class="card">
     <p style="text-align: center; margin-top: 2rem;">
-        <a href="{{ url_for('detailed_stats') }}" class="btn btn-secondary">View Detailed Statistics</a>
-        <button onclick="resetPreferences()" class="btn" style="background-color: #dc3545; margin-left: 1rem;">Reset All Preferences</button>
+        <button onclick="resetPreferences()" class="btn" style="background-color: #dc3545;">Reset All Preferences</button>
     </p>
 </div>
 

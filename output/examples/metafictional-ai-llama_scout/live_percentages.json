@@ -1,0 +1,15 @@
+{
+  "last_updated": "2025-06-04T16:23:36.499647",
+  "total_preferences": 1,
+  "batch_comparisons": {
+    "batch5_stories_vs_initial_stories": {
+      "batch1": "batch5_stories",
+      "batch2": "initial_stories",
+      "total_comparisons": 1,
+      "batch1_wins": 0,
+      "batch2_wins": 1,
+      "batch1_percentage": 0.0,
+      "batch2_percentage": 100.0
+    }
+  }
+}

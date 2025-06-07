@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Test Against LLM Judge{% endblock %}
+
+{% block header %}Judge Testing{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Test Your Judgment Against the LLM</h2>
+    <p><strong>Instructions:</strong> Read both stories below and predict which one the LLM judge would prefer. Then see if your prediction matches the actual AI judgment from the tournament.</p>
+    
+    {% if total_tests > 0 %}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_tests }}</div>
+            <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ correct_tests }}</div>
+            <div class="stat-label">Correct Predictions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ accuracy }}%</div>
+            <div class="stat-label">Accuracy Rate</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 0;">
+        <h3>Story A</h3>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto; margin: 1rem 0;">
+            <p style="white-space: pre-wrap; line-height: 1.8;">{{ story1.piece }}</p>
+        </div>
+        <div style="font-size: 0.9rem; color: #666;">
+            <p><strong>Model:</strong> {{ story1.model_used }}</p>
+            <p><strong>ID:</strong> {{ story1.story_id[:8] }}...</p>
+        </div>
+        <br>
+        <button onclick="predictWinner('story1')" class="btn" style="width: 100%;">LLM Judge Will Prefer Story A</button>
+    </div>
+    
+    <div class="card" style="margin-bottom: 0;">
+        <h3>Story B</h3>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto; margin: 1rem 0;">
+            <p style="white-space: pre-wrap; line-height: 1.8;">{{ story2.piece }}</p>
+        </div>
+        <div style="font-size: 0.9rem; color: #666;">
+            <p><strong>Model:</strong> {{ story2.model_used }}</p>
+            <p><strong>ID:</strong> {{ story2.story_id[:8] }}...</p>
+        </div>
+        <br>
+        <button onclick="predictWinner('story2')" class="btn" style="width: 100%;">LLM Judge Will Prefer Story B</button>
+    </div>
+</div>
+
+<div class="card" style="text-align: center;">
+    <p>
+        <a href="{{ url_for('judge_test') }}" class="btn btn-secondary">Skip This Test</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary" style="margin-left: 1rem;">Back to Home</a>
+    </p>
+</div>
+
+<!-- Result Modal -->
+<div id="resultModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; text-align: center; max-width: 500px;">
+        <h3 id="resultTitle">Result</h3>
+        <p id="resultMessage">Your prediction result will appear here.</p>
+        <div id="resultStats" style="margin: 1rem 0;"></div>
+        <br>
+        <button onclick="closeModal()" class="btn" style="margin-right: 1rem;">Test Another Pair</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+
+<script>
+async function predictWinner(predictedWinner) {
+    try {
+        const response = await fetch('/submit_judge_test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                predicted_winner: predictedWinner
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showResult(result);
+        } else {
+            alert('Error submitting prediction. Please try again.');
+        }
+    } catch (error) {
+        alert('Error submitting prediction. Please try again.');
+    }
+}
+
+function showResult(result) {
+    const modal = document.getElementById('resultModal');
+    const title = document.getElementById('resultTitle');
+    const message = document.getElementById('resultMessage');
+    const stats = document.getElementById('resultStats');
+    
+    if (result.correct) {
+        title.textContent = '🎉 Correct!';
+        title.style.color = '#28a745';
+        message.textContent = result.explanation;
+    } else {
+        title.textContent = '❌ Incorrect';
+        title.style.color = '#dc3545';
+        message.textContent = result.explanation;
+    }
+    
+    // Show updated stats would go here if we tracked them client-side
+    stats.innerHTML = '<p><em>Check the home page for updated accuracy statistics.</em></p>';
+    
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('resultModal').style.display = 'none';
+    // Load next test
+    window.location.href = '{{ url_for("judge_test") }}';
+}
+
+// Close modal when clicking outside
+document.getElementById('resultModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}

@@ -8,22 +8,6 @@
 <div class="card">
     <h2>Comparing: {{ batch1.replace('_', ' ').title() }} vs {{ batch2.replace('_', ' ').title() }}</h2>
     
-    {% if stats.total_comparisons > 0 %}
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.total_comparisons }}</div>
-            <div class="stat-label">Total Comparisons</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.batch1_percentage }}%</div>
-            <div class="stat-label">{{ batch1.replace('_', ' ').title() }} Wins</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.batch2_percentage }}%</div>
-            <div class="stat-label">{{ batch2.replace('_', ' ').title() }} Wins</div>
-        </div>
-    </div>
-    {% endif %}
     
     <p><strong>Instructions:</strong> Read both stories below and select which one you prefer. Your preferences help validate the evolutionary story generation process.</p>
 </div>
