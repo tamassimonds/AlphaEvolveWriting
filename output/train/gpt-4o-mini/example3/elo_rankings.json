@@ -1,0 +1,548 @@
+{
+  "tournament_completed_at": "2025-06-10T15:37:45.488111",
+  "total_matches": 299,
+  "leaderboard": [
+    {
+      "rank": 1,
+      "story_id": "b8ce1f45-2c64-4e25-9bd1-d3d4b3462f65",
+      "model_used": "gpt-4o-mini",
+      "elo": 1384.72,
+      "matches_played": 20,
+      "wins": 18,
+      "losses": 2,
+      "win_rate": 0.9
+    },
+    {
+      "rank": 2,
+      "story_id": "c0ee4e77-efb9-4cd5-8421-627cf3e3cc9b",
+      "model_used": "gpt-4o-mini",
+      "elo": 1321.07,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6,
+      "win_rate": 0.7
+    },
+    {
+      "rank": 3,
+      "story_id": "801dae32-c739-4a3f-9c07-6554bbcd1c8e",
+      "model_used": "gpt-4o-mini",
+      "elo": 1298.08,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 4,
+      "story_id": "34fc47dc-fbf9-4bab-bf4f-7e102504657a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1292.33,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 5,
+      "story_id": "42657adc-4b0c-46d7-ad76-653d5c413db7",
+      "model_used": "gpt-4o-mini",
+      "elo": 1283.61,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 6,
+      "story_id": "0beff87a-de75-460c-9614-6a4bfb700e3a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1278.8,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 7,
+      "story_id": "be469330-7b36-419a-a1cc-9f86d0def85f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1273.0,
+      "matches_played": 19,
+      "wins": 14,
+      "losses": 5,
+      "win_rate": 0.737
+    },
+    {
+      "rank": 8,
+      "story_id": "81f67d04-3ae0-49c9-a255-6dcb0836814e",
+      "model_used": "gpt-4o-mini",
+      "elo": 1269.56,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 9,
+      "story_id": "e47ac40e-e6b8-4919-a8ad-8e1ac21cce9f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1269.26,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6,
+      "win_rate": 0.7
+    },
+    {
+      "rank": 10,
+      "story_id": "5709bad2-12ee-4f58-8025-64115bd24a69",
+      "model_used": "gpt-4o-mini",
+      "elo": 1260.05,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 11,
+      "story_id": "71b660a8-f3de-4aad-a983-190e703c5359",
+      "model_used": "gpt-4o-mini",
+      "elo": 1250.56,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 12,
+      "story_id": "878cb2c6-6455-4136-a684-0256da3c0465",
+      "model_used": "gpt-4o-mini",
+      "elo": 1244.8,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 13,
+      "story_id": "92f982d8-3aeb-485a-a40e-02cee610bd19",
+      "model_used": "gpt-4o-mini",
+      "elo": 1244.5,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 14,
+      "story_id": "603ee2c6-38e5-4ec7-b096-180544c7bf56",
+      "model_used": "gpt-4o-mini",
+      "elo": 1239.64,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 15,
+      "story_id": "999405a5-f4d5-438d-b0ba-7b1c9cb9e197",
+      "model_used": "gpt-4o-mini",
+      "elo": 1234.27,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 16,
+      "story_id": "a0b3c1c5-969e-4abd-8c68-18958f2b2aff",
+      "model_used": "gpt-4o-mini",
+      "elo": 1228.26,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 17,
+      "story_id": "b720095b-f357-4839-9544-51e4a969b788",
+      "model_used": "gpt-4o-mini",
+      "elo": 1220.14,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 18,
+      "story_id": "ccfe59dd-2973-4701-bf42-14154b299bcc",
+      "model_used": "gpt-4o-mini",
+      "elo": 1203.13,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 19,
+      "story_id": "80f9e149-eef3-4ecd-bbec-3289f52f33bc",
+      "model_used": "gpt-4o-mini",
+      "elo": 1197.51,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 20,
+      "story_id": "a7e22aa3-3302-44f2-a599-8e5811649e52",
+      "model_used": "gpt-4o-mini",
+      "elo": 1173.82,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12,
+      "win_rate": 0.4
+    },
+    {
+      "rank": 21,
+      "story_id": "4a42627c-2ee4-46f5-86f3-beb6e474ecfd",
+      "model_used": "gpt-4o-mini",
+      "elo": 1167.73,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12,
+      "win_rate": 0.4
+    },
+    {
+      "rank": 22,
+      "story_id": "d1165b81-3d01-40d8-b1dd-bd66f104734f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1162.28,
+      "matches_played": 19,
+      "wins": 8,
+      "losses": 11,
+      "win_rate": 0.421
+    },
+    {
+      "rank": 23,
+      "story_id": "d4bf31ad-00ac-421a-9302-dd85b65dbb91",
+      "model_used": "gpt-4o-mini",
+      "elo": 1148.43,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12,
+      "win_rate": 0.4
+    },
+    {
+      "rank": 24,
+      "story_id": "d52feb6b-19ba-4c80-86a4-06d248d5cbda",
+      "model_used": "gpt-4o-mini",
+      "elo": 1120.75,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15,
+      "win_rate": 0.25
+    },
+    {
+      "rank": 25,
+      "story_id": "f7aeb9e5-bcda-4f35-9a8b-b6da3212f1a7",
+      "model_used": "gpt-4o-mini",
+      "elo": 1116.01,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13,
+      "win_rate": 0.35
+    },
+    {
+      "rank": 26,
+      "story_id": "bcc7907a-5929-4862-8ba4-17752b491c2a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1059.34,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17,
+      "win_rate": 0.15
+    },
+    {
+      "rank": 27,
+      "story_id": "e31b8ad4-d0f9-4432-a3dc-e99184761797",
+      "model_used": "gpt-4o-mini",
+      "elo": 1041.82,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17,
+      "win_rate": 0.15
+    },
+    {
+      "rank": 28,
+      "story_id": "4aa34f1f-ebcd-4370-9519-4a827e3e4e9b",
+      "model_used": "gpt-4o-mini",
+      "elo": 1032.87,
+      "matches_played": 20,
+      "wins": 2,
+      "losses": 18,
+      "win_rate": 0.1
+    },
+    {
+      "rank": 29,
+      "story_id": "894e334c-4b2c-4478-9a89-bfbb8da13558",
+      "model_used": "gpt-4o-mini",
+      "elo": 1008.4,
+      "matches_played": 20,
+      "wins": 1,
+      "losses": 19,
+      "win_rate": 0.05
+    },
+    {
+      "rank": 30,
+      "story_id": "0d572d0d-d88e-4c7f-9838-78932937d40a",
+      "model_used": "gpt-4o-mini",
+      "elo": 975.27,
+      "matches_played": 20,
+      "wins": 0,
+      "losses": 20,
+      "win_rate": 0.0
+    }
+  ],
+  "stories": [
+    {
+      "story_id": "e47ac40e-e6b8-4919-a8ad-8e1ac21cce9f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1269.2583561445315,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6
+    },
+    {
+      "story_id": "0beff87a-de75-460c-9614-6a4bfb700e3a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1278.8049035660963,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "34fc47dc-fbf9-4bab-bf4f-7e102504657a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1292.3261094916443,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "603ee2c6-38e5-4ec7-b096-180544c7bf56",
+      "model_used": "gpt-4o-mini",
+      "elo": 1239.6437043258497,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "71b660a8-f3de-4aad-a983-190e703c5359",
+      "model_used": "gpt-4o-mini",
+      "elo": 1250.562921298649,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "894e334c-4b2c-4478-9a89-bfbb8da13558",
+      "model_used": "gpt-4o-mini",
+      "elo": 1008.4022658373466,
+      "matches_played": 20,
+      "wins": 1,
+      "losses": 19
+    },
+    {
+      "story_id": "d1165b81-3d01-40d8-b1dd-bd66f104734f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1162.2829689624805,
+      "matches_played": 19,
+      "wins": 8,
+      "losses": 11
+    },
+    {
+      "story_id": "4a42627c-2ee4-46f5-86f3-beb6e474ecfd",
+      "model_used": "gpt-4o-mini",
+      "elo": 1167.728891517901,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12
+    },
+    {
+      "story_id": "d52feb6b-19ba-4c80-86a4-06d248d5cbda",
+      "model_used": "gpt-4o-mini",
+      "elo": 1120.747021126391,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15
+    },
+    {
+      "story_id": "f7aeb9e5-bcda-4f35-9a8b-b6da3212f1a7",
+      "model_used": "gpt-4o-mini",
+      "elo": 1116.0062499145015,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13
+    },
+    {
+      "story_id": "c0ee4e77-efb9-4cd5-8421-627cf3e3cc9b",
+      "model_used": "gpt-4o-mini",
+      "elo": 1321.0688017823554,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6
+    },
+    {
+      "story_id": "5709bad2-12ee-4f58-8025-64115bd24a69",
+      "model_used": "gpt-4o-mini",
+      "elo": 1260.04831061197,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "801dae32-c739-4a3f-9c07-6554bbcd1c8e",
+      "model_used": "gpt-4o-mini",
+      "elo": 1298.077333530926,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "878cb2c6-6455-4136-a684-0256da3c0465",
+      "model_used": "gpt-4o-mini",
+      "elo": 1244.8037734505629,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "be469330-7b36-419a-a1cc-9f86d0def85f",
+      "model_used": "gpt-4o-mini",
+      "elo": 1272.9974607821844,
+      "matches_played": 19,
+      "wins": 14,
+      "losses": 5
+    },
+    {
+      "story_id": "b8ce1f45-2c64-4e25-9bd1-d3d4b3462f65",
+      "model_used": "gpt-4o-mini",
+      "elo": 1384.7219458010316,
+      "matches_played": 20,
+      "wins": 18,
+      "losses": 2
+    },
+    {
+      "story_id": "42657adc-4b0c-46d7-ad76-653d5c413db7",
+      "model_used": "gpt-4o-mini",
+      "elo": 1283.6137152379636,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "e31b8ad4-d0f9-4432-a3dc-e99184761797",
+      "model_used": "gpt-4o-mini",
+      "elo": 1041.8181937269594,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17
+    },
+    {
+      "story_id": "999405a5-f4d5-438d-b0ba-7b1c9cb9e197",
+      "model_used": "gpt-4o-mini",
+      "elo": 1234.2668362400877,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "b720095b-f357-4839-9544-51e4a969b788",
+      "model_used": "gpt-4o-mini",
+      "elo": 1220.1358508754477,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "a0b3c1c5-969e-4abd-8c68-18958f2b2aff",
+      "model_used": "gpt-4o-mini",
+      "elo": 1228.2572800367157,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "0d572d0d-d88e-4c7f-9838-78932937d40a",
+      "model_used": "gpt-4o-mini",
+      "elo": 975.2727151798564,
+      "matches_played": 20,
+      "wins": 0,
+      "losses": 20
+    },
+    {
+      "story_id": "a7e22aa3-3302-44f2-a599-8e5811649e52",
+      "model_used": "gpt-4o-mini",
+      "elo": 1173.8245768559996,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12
+    },
+    {
+      "story_id": "80f9e149-eef3-4ecd-bbec-3289f52f33bc",
+      "model_used": "gpt-4o-mini",
+      "elo": 1197.5093564890456,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    },
+    {
+      "story_id": "4aa34f1f-ebcd-4370-9519-4a827e3e4e9b",
+      "model_used": "gpt-4o-mini",
+      "elo": 1032.8669442791402,
+      "matches_played": 20,
+      "wins": 2,
+      "losses": 18
+    },
+    {
+      "story_id": "92f982d8-3aeb-485a-a40e-02cee610bd19",
+      "model_used": "gpt-4o-mini",
+      "elo": 1244.5002108609556,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "d4bf31ad-00ac-421a-9302-dd85b65dbb91",
+      "model_used": "gpt-4o-mini",
+      "elo": 1148.4274787789304,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12
+    },
+    {
+      "story_id": "81f67d04-3ae0-49c9-a255-6dcb0836814e",
+      "model_used": "gpt-4o-mini",
+      "elo": 1269.5626176278722,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "bcc7907a-5929-4862-8ba4-17752b491c2a",
+      "model_used": "gpt-4o-mini",
+      "elo": 1059.3361007057688,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17
+    },
+    {
+      "story_id": "ccfe59dd-2973-4701-bf42-14154b299bcc",
+      "model_used": "gpt-4o-mini",
+      "elo": 1203.127104960836,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    }
+  ]
+}

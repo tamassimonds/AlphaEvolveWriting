@@ -12,3 +12,5 @@ __pycache__/
 .DS_Store
 
 myenv/
+
+format_for_sft.py

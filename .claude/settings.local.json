@@ -6,7 +6,8 @@
       "Bash(python3:*)",
       "Bash(grep:*)",
       "Bash(chmod:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }
