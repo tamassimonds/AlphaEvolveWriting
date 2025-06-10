@@ -15,4 +15,4 @@ myenv/
 
 format_for_sft.py
 
-output/train
+output/train/
