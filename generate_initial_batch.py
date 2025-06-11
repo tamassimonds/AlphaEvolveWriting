@@ -13,7 +13,13 @@ from datetime import datetime
 from typing import List, Dict, Any
 import shutil
 
-from lib.generate_response import generate_simple_piece
+import os
+
+# Conditional import based on USE_GENERAL_MODE environment variable
+if os.environ.get('USE_GENERAL_MODE'):
+    from lib.generate_response_general import generate_initial_piece
+else:
+    from lib.generate_response import generate_initial_piece
 
 
 async def generate_single_story(
@@ -41,7 +47,7 @@ async def generate_single_story(
         print(f"🚀 Starting generation of story {story_index + 1}...")
         
         # Generate the story
-        piece = await generate_simple_piece(
+        piece = await generate_initial_piece(
             story_description=prompt,
             model=model,
             rubric_file=rubric_file

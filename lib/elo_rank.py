@@ -323,7 +323,11 @@ class EloRankingSystem:
                 successful_matches = 0
                 for j, result in enumerate(batch_results):
                     if isinstance(result, Exception):
-                        print(f"   ❌ Match {i+j+1} failed: {result}")
+                        error_msg = str(result)
+                        # Truncate very long error messages to avoid printing full stories
+                        if len(error_msg) > 200:
+                            error_msg = error_msg[:200] + "... [truncated]"
+                        print(f"   ❌ Match {i+j+1} failed: {error_msg}")
                     else:
                         all_matches.append(result)
                         match = result

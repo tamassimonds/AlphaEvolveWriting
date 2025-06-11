@@ -1,21 +1,21 @@
 {
   "batch_generation": {
     "num_stories": 40,
-    "model": "meta-llama/Llama-3.2-3B-Instruct",
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
     "max_attempts": 3,
     "initial_elo": 1200
   },
   "next_batch_generation": {
     "top_stories_to_select": 5,
     "variants_per_story": 5,
-    "model": "meta-llama/Llama-3.2-3B-Instruct",
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
     "max_attempts": 3,
     "include_original_stories": true,
     "variant_temperature": 1.2
   },
   "elo_ranking": {
     "k_factor": 32,
-    "judge_model": "gpt-4o-mini",
+    "judge_model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
     "tournament_rounds": 20,
     "max_concurrent_matches": 60,
     "min_elo_difference": 0,

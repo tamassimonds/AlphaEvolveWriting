@@ -12,6 +12,7 @@ Usage:
 """
 
 import sys
+import os
 import asyncio
 from run_evolution_pipeline import EvolutionPipeline
 
@@ -26,14 +27,16 @@ def main():
     # Parse simple arguments
     iterations = None  # Will use config default if not specified
     fresh_start = False
+    use_general = False
     
     if len(sys.argv) > 1:
         if sys.argv[1] == "--help" or sys.argv[1] == "-h":
             print(__doc__)
             print("\nQuick usage:")
-            print("  python evolve.py [iterations] [--fresh]")
+            print("  python evolve.py [iterations] [--fresh] [--general]")
             print(f"  iterations: number of evolution cycles (default from config: {default_iterations})")
             print("  --fresh: start fresh even if existing batches found")
+            print("  --general: use general writing mode instead of creative writing")
             print("\nFor advanced options, use: python run_evolution_pipeline.py --help")
             return 0
             
@@ -46,7 +49,15 @@ def main():
     if "--fresh" in sys.argv:
         fresh_start = True
     
+    if "--general" in sys.argv:
+        use_general = True
+    
     async def run():
+        # Set environment variable for general mode
+        if use_general:
+            os.environ['USE_GENERAL_MODE'] = '1'
+            print("📝 Using general writing mode")
+        
         # Use the pipeline we already created
         if fresh_start:
             pipeline.existing_batches = []

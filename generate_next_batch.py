@@ -15,7 +15,13 @@ from datetime import datetime
 from typing import List, Dict, Any
 import shutil
 
-from lib.generate_response import generate_story_variant
+import os
+
+# Conditional import based on USE_GENERAL_MODE environment variable
+if os.environ.get('USE_GENERAL_MODE'):
+    from lib.generate_response_general import generate_story_variant
+else:
+    from lib.generate_response import generate_story_variant
 
 
 async def generate_all_variants_parallel(
