@@ -1,0 +1,548 @@
+{
+  "tournament_completed_at": "2025-06-11T14:24:42.178789",
+  "total_matches": 290,
+  "leaderboard": [
+    {
+      "rank": 1,
+      "story_id": "66b7f9a4-4416-4807-84b5-ead64362d033",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1312.15,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5,
+      "win_rate": 0.75
+    },
+    {
+      "rank": 2,
+      "story_id": "299063a4-c6f9-4ff3-a13e-743780ae509e",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1287.22,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 3,
+      "story_id": "46eb55de-782a-4fe4-b706-e1c2a3471190",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1285.78,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6,
+      "win_rate": 0.7
+    },
+    {
+      "rank": 4,
+      "story_id": "03049b34-b41f-4902-b352-dbe8a8531ad5",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1279.79,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6,
+      "win_rate": 0.7
+    },
+    {
+      "rank": 5,
+      "story_id": "0a89bee0-c27e-4c6e-9c62-6ec07e295906",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1278.39,
+      "matches_played": 19,
+      "wins": 13,
+      "losses": 6,
+      "win_rate": 0.684
+    },
+    {
+      "rank": 6,
+      "story_id": "f8ccfd5d-6f22-48cb-bffa-786fa8f3c277",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1278.15,
+      "matches_played": 18,
+      "wins": 12,
+      "losses": 6,
+      "win_rate": 0.667
+    },
+    {
+      "rank": 7,
+      "story_id": "27c720bd-3f71-4898-924a-566437a10583",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1253.7,
+      "matches_played": 19,
+      "wins": 11,
+      "losses": 8,
+      "win_rate": 0.579
+    },
+    {
+      "rank": 8,
+      "story_id": "ed6e0c27-7209-4aae-a259-12bc70a77730",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1252.54,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 9,
+      "story_id": "01cca701-3675-48f7-8a91-a4ba4abbbf9b",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1252.47,
+      "matches_played": 18,
+      "wins": 12,
+      "losses": 6,
+      "win_rate": 0.667
+    },
+    {
+      "rank": 10,
+      "story_id": "3b352c1a-0ebe-44be-b599-36b1127b4a88",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1248.5,
+      "matches_played": 19,
+      "wins": 12,
+      "losses": 7,
+      "win_rate": 0.632
+    },
+    {
+      "rank": 11,
+      "story_id": "bf332e87-a208-4832-9858-2767d67466f0",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1246.93,
+      "matches_played": 18,
+      "wins": 11,
+      "losses": 7,
+      "win_rate": 0.611
+    },
+    {
+      "rank": 12,
+      "story_id": "1c1a0be5-49a6-4a24-b316-559fcc925057",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1246.32,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7,
+      "win_rate": 0.65
+    },
+    {
+      "rank": 13,
+      "story_id": "2fce09eb-eb7e-482e-ab7c-2c0aa52cc41a",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1241.88,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 14,
+      "story_id": "6a184e08-8e0f-4c9f-b6fb-1c74ab404db9",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1232.18,
+      "matches_played": 19,
+      "wins": 11,
+      "losses": 8,
+      "win_rate": 0.579
+    },
+    {
+      "rank": 15,
+      "story_id": "cc3cd060-f851-4101-9b9c-0955cf6ff9a2",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1227.4,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 16,
+      "story_id": "5dc3cd97-8353-4c64-bf44-4c20119e2094",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1226.06,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9,
+      "win_rate": 0.55
+    },
+    {
+      "rank": 17,
+      "story_id": "9f8511a9-9ac4-4eb4-9f3c-9f5ba09fb106",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1215.72,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8,
+      "win_rate": 0.6
+    },
+    {
+      "rank": 18,
+      "story_id": "974c54f5-782d-46f4-a1c9-170f2b2ec2d7",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1203.59,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10,
+      "win_rate": 0.5
+    },
+    {
+      "rank": 19,
+      "story_id": "9122a529-ef91-435d-a50f-95098888d0f0",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1189.08,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11,
+      "win_rate": 0.45
+    },
+    {
+      "rank": 20,
+      "story_id": "2cdb2968-b284-4ebb-8e13-37303d9ec7ed",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1165.87,
+      "matches_played": 19,
+      "wins": 8,
+      "losses": 11,
+      "win_rate": 0.421
+    },
+    {
+      "rank": 21,
+      "story_id": "f52be068-2c2b-4768-a6ac-ac2bf4be1462",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1161.47,
+      "matches_played": 17,
+      "wins": 7,
+      "losses": 10,
+      "win_rate": 0.412
+    },
+    {
+      "rank": 22,
+      "story_id": "1e64b9cc-debf-45e2-a4de-bdafbfcb3367",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1158.18,
+      "matches_played": 18,
+      "wins": 7,
+      "losses": 11,
+      "win_rate": 0.389
+    },
+    {
+      "rank": 23,
+      "story_id": "8f5fdffd-a132-4519-9373-98858a0d5cca",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1147.04,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12,
+      "win_rate": 0.4
+    },
+    {
+      "rank": 24,
+      "story_id": "82e59d86-4a4c-474e-9809-7f940c98d6ff",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1143.54,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13,
+      "win_rate": 0.35
+    },
+    {
+      "rank": 25,
+      "story_id": "0f06152f-9a27-416a-aacf-e6d0767b81d1",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1132.68,
+      "matches_played": 19,
+      "wins": 6,
+      "losses": 13,
+      "win_rate": 0.316
+    },
+    {
+      "rank": 26,
+      "story_id": "5d353516-95aa-4d7c-bde1-4e9ba78bcc31",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1106.26,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14,
+      "win_rate": 0.3
+    },
+    {
+      "rank": 27,
+      "story_id": "6431e71b-04ec-417f-af74-5c0cc0048e0c",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1092.05,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15,
+      "win_rate": 0.25
+    },
+    {
+      "rank": 28,
+      "story_id": "20ccdabc-4b82-4af6-8f0b-600747f752ea",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1050.67,
+      "matches_played": 18,
+      "wins": 2,
+      "losses": 16,
+      "win_rate": 0.111
+    },
+    {
+      "rank": 29,
+      "story_id": "e9c0c0e5-523c-4cfa-8dc7-0a8d1db096b1",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1047.05,
+      "matches_played": 19,
+      "wins": 2,
+      "losses": 17,
+      "win_rate": 0.105
+    },
+    {
+      "rank": 30,
+      "story_id": "8530dce6-c96b-4313-94ab-0fe290e89bdd",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1037.37,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17,
+      "win_rate": 0.15
+    }
+  ],
+  "stories": [
+    {
+      "story_id": "5dc3cd97-8353-4c64-bf44-4c20119e2094",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1226.0639736958117,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "27c720bd-3f71-4898-924a-566437a10583",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1253.7013619112163,
+      "matches_played": 19,
+      "wins": 11,
+      "losses": 8
+    },
+    {
+      "story_id": "bf332e87-a208-4832-9858-2767d67466f0",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1246.9273064467768,
+      "matches_played": 18,
+      "wins": 11,
+      "losses": 7
+    },
+    {
+      "story_id": "cc3cd060-f851-4101-9b9c-0955cf6ff9a2",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1227.3999889192826,
+      "matches_played": 20,
+      "wins": 11,
+      "losses": 9
+    },
+    {
+      "story_id": "9f8511a9-9ac4-4eb4-9f3c-9f5ba09fb106",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1215.7221196535645,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "1c1a0be5-49a6-4a24-b316-559fcc925057",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1246.317171032106,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "2fce09eb-eb7e-482e-ab7c-2c0aa52cc41a",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1241.878214664039,
+      "matches_played": 20,
+      "wins": 12,
+      "losses": 8
+    },
+    {
+      "story_id": "0f06152f-9a27-416a-aacf-e6d0767b81d1",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1132.6751718115167,
+      "matches_played": 19,
+      "wins": 6,
+      "losses": 13
+    },
+    {
+      "story_id": "2cdb2968-b284-4ebb-8e13-37303d9ec7ed",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1165.8661361096895,
+      "matches_played": 19,
+      "wins": 8,
+      "losses": 11
+    },
+    {
+      "story_id": "6a184e08-8e0f-4c9f-b6fb-1c74ab404db9",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1232.1760695405676,
+      "matches_played": 19,
+      "wins": 11,
+      "losses": 8
+    },
+    {
+      "story_id": "5d353516-95aa-4d7c-bde1-4e9ba78bcc31",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1106.2569541754456,
+      "matches_played": 20,
+      "wins": 6,
+      "losses": 14
+    },
+    {
+      "story_id": "20ccdabc-4b82-4af6-8f0b-600747f752ea",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1050.6653803016004,
+      "matches_played": 18,
+      "wins": 2,
+      "losses": 16
+    },
+    {
+      "story_id": "8530dce6-c96b-4313-94ab-0fe290e89bdd",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1037.3722488235596,
+      "matches_played": 20,
+      "wins": 3,
+      "losses": 17
+    },
+    {
+      "story_id": "f52be068-2c2b-4768-a6ac-ac2bf4be1462",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1161.4683265858935,
+      "matches_played": 17,
+      "wins": 7,
+      "losses": 10
+    },
+    {
+      "story_id": "e9c0c0e5-523c-4cfa-8dc7-0a8d1db096b1",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1047.0465635930293,
+      "matches_played": 19,
+      "wins": 2,
+      "losses": 17
+    },
+    {
+      "story_id": "01cca701-3675-48f7-8a91-a4ba4abbbf9b",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1252.4685852764233,
+      "matches_played": 18,
+      "wins": 12,
+      "losses": 6
+    },
+    {
+      "story_id": "82e59d86-4a4c-474e-9809-7f940c98d6ff",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1143.5422655400664,
+      "matches_played": 20,
+      "wins": 7,
+      "losses": 13
+    },
+    {
+      "story_id": "1e64b9cc-debf-45e2-a4de-bdafbfcb3367",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1158.178952444581,
+      "matches_played": 18,
+      "wins": 7,
+      "losses": 11
+    },
+    {
+      "story_id": "f8ccfd5d-6f22-48cb-bffa-786fa8f3c277",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1278.1497527157007,
+      "matches_played": 18,
+      "wins": 12,
+      "losses": 6
+    },
+    {
+      "story_id": "8f5fdffd-a132-4519-9373-98858a0d5cca",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1147.0400842033323,
+      "matches_played": 20,
+      "wins": 8,
+      "losses": 12
+    },
+    {
+      "story_id": "0a89bee0-c27e-4c6e-9c62-6ec07e295906",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1278.3949761594392,
+      "matches_played": 19,
+      "wins": 13,
+      "losses": 6
+    },
+    {
+      "story_id": "ed6e0c27-7209-4aae-a259-12bc70a77730",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1252.5358942674072,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "3b352c1a-0ebe-44be-b599-36b1127b4a88",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1248.504953751211,
+      "matches_played": 19,
+      "wins": 12,
+      "losses": 7
+    },
+    {
+      "story_id": "974c54f5-782d-46f4-a1c9-170f2b2ec2d7",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1203.5917875932835,
+      "matches_played": 20,
+      "wins": 10,
+      "losses": 10
+    },
+    {
+      "story_id": "6431e71b-04ec-417f-af74-5c0cc0048e0c",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1092.0532336154447,
+      "matches_played": 20,
+      "wins": 5,
+      "losses": 15
+    },
+    {
+      "story_id": "9122a529-ef91-435d-a50f-95098888d0f0",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1189.0756560196096,
+      "matches_played": 20,
+      "wins": 9,
+      "losses": 11
+    },
+    {
+      "story_id": "299063a4-c6f9-4ff3-a13e-743780ae509e",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1287.2156929123396,
+      "matches_played": 20,
+      "wins": 13,
+      "losses": 7
+    },
+    {
+      "story_id": "03049b34-b41f-4902-b352-dbe8a8531ad5",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1279.78527304099,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6
+    },
+    {
+      "story_id": "66b7f9a4-4416-4807-84b5-ead64362d033",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1312.146896971447,
+      "matches_played": 20,
+      "wins": 15,
+      "losses": 5
+    },
+    {
+      "story_id": "46eb55de-782a-4fe4-b706-e1c2a3471190",
+      "model_used": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "elo": 1285.7790082246256,
+      "matches_played": 20,
+      "wins": 14,
+      "losses": 6
+    }
+  ]
+}

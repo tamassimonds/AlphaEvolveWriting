@@ -1,6 +1,6 @@
 {
   "batch_generation": {
-    "num_stories": 40,
+    "num_stories": 60,
     "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
     "max_attempts": 3,
     "initial_elo": 1200
