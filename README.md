@@ -4,6 +4,85 @@ You can find the full explanation [here](https://tobysimonds.com/research/2025/0
 
 An evolutionary writing system that uses AI models to generate, evaluate, and evolve creative stories or general writing pieces through iterative competitions.
 
+**Mission Sets** - Define creative goals and approaches:
+- `emotional_depth`: Focus on psychological depth and character emotions
+- `atmospheric_immersion`: Emphasize setting and sensory details
+- `narrative_innovation`: Experiment with unique storytelling techniques
+
+**Author Styles** - Simulate different writing voices:
+- Various author styles with specific characteristics and techniques
+- Randomly selected for each story generation to create diversity
+
+**Improvement Sets** - Define how stories evolve:
+- `character_development`: Enhance character depth and relationships
+- `plot_structure`: Improve narrative flow and pacing
+- `dialogue_enhancement`: Strengthen character voices and conversations
+
+##### General Writing Mode (`lib/generate_response_general.py`)
+
+**Writing Approaches** - Different analytical and research methods:
+- `analytical_depth`: Focus on logical analysis and critical thinking
+- `research_synthesis`: Emphasize thorough research integration
+- `structural_innovation`: Experiment with organizational techniques
+
+**Writing Styles** - Professional writing approaches:
+- `academic_precision`: Scholarly writing with strong foundation
+- `journalistic_clarity`: Clear, engaging informational style
+- `technical_expertise`: Complex topics explained effectively
+- `policy_analysis`: Systematic policy examination
+- `business_professional`: Action-oriented business writing
+
+**Improvement Sets** - How general writing evolves:
+- `argument_strength`: Strengthen logic and evidence
+- `research_integration`: Better source integration
+- `clarity_improvement`: Enhance readability and structure
+
+#### Customizing Generation Prompts
+
+To modify how the AI generates content, edit the prompt templates in:
+
+1. **Creative Writing** (`lib/generate_response.py`):
+   - Edit the `generate_initial_piece()` function around line 370
+   - Modify mission/style selection logic in `get_random_mission()` and `get_random_author_style()`
+   - Customize improvement prompts in `generate_story_variant()` around line 430
+
+2. **General Writing** (`lib/generate_response_general.py`):
+   - Edit the `generate_initial_piece()` function around line 369
+   - Modify approach/style selection in `get_random_approach()` and `get_random_writing_style()`
+   - Customize improvement prompts in `generate_piece_variant()` around line 406
+
+#### Adding New Writing Styles
+
+1. **For Creative Writing**: Add new entries to `MISSION_SETS`, `AUTHOR_STYLES`, or `IMPROVEMENT_SETS` arrays
+2. **For General Writing**: Add new entries to `WRITING_APPROACHES`, `WRITING_STYLES`, or `IMPROVEMENT_SETS` arrays
+
+Each entry should include:
+- `name`: Unique identifier
+- `description`: Brief explanation
+- `goals` or `characteristics`: List of specific attributes
+
+#### Example: Adding a New Creative Writing Style
+
+```python
+{
+    "name": "horror_atmospheric",
+    "description": "Dark, suspenseful horror writing",
+    "characteristics": [
+        "Build tension through pacing and atmosphere",
+        "Use sensory details to create unease",
+        "Develop psychological horror elements",
+        "Create compelling supernatural or psychological threats"
+    ]
+}
+```
+
+## Output
+
+- `initial_stories.json` - First generation of stories
+- `batch2_stories.json`, `batch3_stories.json`, etc. - Evolved generations
+- `elo_rankings.json` - Current story rankings
+- `match_history.json` - Tournament match results
+
 ## Installation
 
 ### 1. Install Dependencies
@@ -126,4 +205,79 @@ The system uses different generation strategies depending on the mode:
 
 **Mission Sets** - Define creative goals and approaches:
 - `emotional_depth`: Focus on psychological depth and character emotions
-- `
+- `atmospheric_immersion`: Emphasize setting and sensory details
+- `narrative_innovation`: Experiment with unique storytelling techniques
+
+**Author Styles** - Simulate different writing voices:
+- Various author styles with specific characteristics and techniques
+- Randomly selected for each story generation to create diversity
+
+**Improvement Sets** - Define how stories evolve:
+- `character_development`: Enhance character depth and relationships
+- `plot_structure`: Improve narrative flow and pacing
+- `dialogue_enhancement`: Strengthen character voices and conversations
+
+##### General Writing Mode (`lib/generate_response_general.py`)
+
+**Writing Approaches** - Different analytical and research methods:
+- `analytical_depth`: Focus on logical analysis and critical thinking
+- `research_synthesis`: Emphasize thorough research integration
+- `structural_innovation`: Experiment with organizational techniques
+
+**Writing Styles** - Professional writing approaches:
+- `academic_precision`: Scholarly writing with strong foundation
+- `journalistic_clarity`: Clear, engaging informational style
+- `technical_expertise`: Complex topics explained effectively
+- `policy_analysis`: Systematic policy examination
+- `business_professional`: Action-oriented business writing
+
+**Improvement Sets** - How general writing evolves:
+- `argument_strength`: Strengthen logic and evidence
+- `research_integration`: Better source integration
+- `clarity_improvement`: Enhance readability and structure
+
+#### Customizing Generation Prompts
+
+To modify how the AI generates content, edit the prompt templates in:
+
+1. **Creative Writing** (`lib/generate_response.py`):
+   - Edit the `generate_initial_piece()` function around line 370
+   - Modify mission/style selection logic in `get_random_mission()` and `get_random_author_style()`
+   - Customize improvement prompts in `generate_story_variant()` around line 430
+
+2. **General Writing** (`lib/generate_response_general.py`):
+   - Edit the `generate_initial_piece()` function around line 369
+   - Modify approach/style selection in `get_random_approach()` and `get_random_writing_style()`
+   - Customize improvement prompts in `generate_piece_variant()` around line 406
+
+#### Adding New Writing Styles
+
+1. **For Creative Writing**: Add new entries to `MISSION_SETS`, `AUTHOR_STYLES`, or `IMPROVEMENT_SETS` arrays
+2. **For General Writing**: Add new entries to `WRITING_APPROACHES`, `WRITING_STYLES`, or `IMPROVEMENT_SETS` arrays
+
+Each entry should include:
+- `name`: Unique identifier
+- `description`: Brief explanation
+- `goals` or `characteristics`: List of specific attributes
+
+#### Example: Adding a New Creative Writing Style
+
+```python
+{
+    "name": "horror_atmospheric",
+    "description": "Dark, suspenseful horror writing",
+    "characteristics": [
+        "Build tension through pacing and atmosphere",
+        "Use sensory details to create unease",
+        "Develop psychological horror elements",
+        "Create compelling supernatural or psychological threats"
+    ]
+}
+```
+
+## Output
+
+- `initial_stories.json` - First generation of stories
+- `batch2_stories.json`, `batch3_stories.json`, etc. - Evolved generations
+- `elo_rankings.json` - Current story rankings
+- `match_history.json` - Tournament match results
