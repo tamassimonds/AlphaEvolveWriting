@@ -1,6 +1,6 @@
-Prompt: The king, after hearing the prophecy about a child fated to depose them, decided to just let the events play out without interfering.
+PROMPT: The king, after hearing the prophecy about a child fated to depose them, decided to just let the events play out without interfering.
 
-You should write something truely profound that would majorly impress judges of creative writting competition
+TASK: Write a profound and memorable story based on this premise, crafted to win a creative writing competition.
 
-Write a 500 words max
+CONSTRAINTS: Maximum 500 words.
 
