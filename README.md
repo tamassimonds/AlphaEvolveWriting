@@ -353,25 +353,3 @@ python evolve.py 5
 docker build -t alphaevolve-writing .
 docker run -it alphaevolve-writing evolve.py 5
 ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes following the coding standards
-4. Add tests for new functionality
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🔗 Links
-
-- [Full Technical Explanation](https://tobysimonds.com/research/2025/06/06/LLM-Self-Rewarding-copy.html)
-- [Documentation](https://docs.alphaevolve.com)
-- [Issues](https://github.com/alphaevolve/alphaevolve-writing/issues)
-
-## 🙏 Acknowledgments
-
-Built with modern Python practices and inspired by evolutionary algorithms in AI research.
