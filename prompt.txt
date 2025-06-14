@@ -2,5 +2,3 @@ PROMPT: The king, after hearing the prophecy about a child fated to depose them,
 
 TASK: Write a profound and memorable story based on this premise, crafted to win a creative writing competition.
 
-CONSTRAINTS: Maximum 500 words.
-

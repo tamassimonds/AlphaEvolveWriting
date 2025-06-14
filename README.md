@@ -1,8 +1,13 @@
 # AlphaEvolve Writing
 
+![AlphaEvolve Writing Process](assets/AlphaWriteProcess.png)
+
 You can find the full explanation [here](https://tobysimonds.com/research/2025/06/06/LLM-Self-Rewarding-copy.html)
 
 A modern, evolutionary writing system that uses AI models to generate, evaluate, and evolve creative stories or general writing pieces through iterative competitions. Built with clean, modular Python architecture following modern design principles.
+
+
+
 
 ## ✨ Features
 
