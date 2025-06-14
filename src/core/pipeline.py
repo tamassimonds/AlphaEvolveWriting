@@ -1,15 +1,11 @@
-#!/usr/bin/env python3
 """
-Automated Evolution Pipeline
+Core Evolution Pipeline
 
-This script runs the complete story evolution pipeline:
+Manages the automated story evolution pipeline:
 1. Generate initial batch of stories
 2. Run ELO tournament to rank them
 3. Generate next batch based on top performers
 4. Repeat for N iterations
-
-The pipeline evolves stories through multiple generations, using randomized
-missions and author styles to create diverse, high-quality creative writing.
 """
 
 import asyncio
@@ -19,12 +15,10 @@ import sys
 import time
 from datetime import datetime
 from typing import Dict, Any, List
-import argparse
+import glob
 
-# Import the pipeline components
-from generate_initial_batch import main as generate_initial_main
-from run_elo_tournament import main as run_tournament_main
-from generate_next_batch import main as generate_next_main
+from ..generators.story_generator import InitialStoryGenerator, NextBatchGenerator
+from ..rankers.tournament_runner import TournamentRunner
 
 
 class EvolutionPipeline:
@@ -63,12 +57,9 @@ class EvolutionPipeline:
         Returns:
             List of existing batch file paths, sorted by creation/modification time
         """
-        import glob
-        
         try:
             output_dir = self.config["output"]["directory"]
             
-            # Look for story batch files
             batch_patterns = [
                 os.path.join(output_dir, "initial_stories.json"),
                 os.path.join(output_dir, "batch*_stories.json"),
@@ -80,7 +71,6 @@ class EvolutionPipeline:
                 files = glob.glob(pattern)
                 all_batch_files.extend(files)
             
-            # Remove duplicates and sort by modification time
             all_batch_files = list(set(all_batch_files))
             all_batch_files.sort(key=lambda f: os.path.getmtime(f))
             
@@ -103,7 +93,6 @@ class EvolutionPipeline:
         latest_batch = self.existing_batches[-1]
         filename = os.path.basename(latest_batch)
         
-        # Extract batch number from filename
         if "initial_stories.json" in filename:
             return 1
         elif "batch" in filename:
@@ -112,7 +101,7 @@ class EvolutionPipeline:
             if match:
                 return int(match.group(1))
         
-        return 1  # Default to 1 if we can't parse
+        return 1
     
     def log(self, message: str, level: str = "INFO"):
         """Log a message with timestamp."""
@@ -148,17 +137,11 @@ class EvolutionPipeline:
         """Run initial story generation."""
         self.log("📝 Step 1: Generating initial batch of stories...")
         try:
-            await generate_initial_main()
+            generator = InitialStoryGenerator(self.config)
+            stories = await generator.generate_batch()
             
-            # Count stories generated
-            output_dir = self.config["output"]["directory"]
-            stories_file = os.path.join(output_dir, self.config["output"]["stories_file"])
-            if os.path.exists(stories_file):
-                with open(stories_file, "r") as f:
-                    data = json.load(f)
-                    story_count = len(data.get("stories", []))
-                    self.stats["total_stories_generated"] += story_count
-                    self.log(f"✅ Generated {story_count} initial stories")
+            self.stats["total_stories_generated"] += len(stories)
+            self.log(f"✅ Generated {len(stories)} initial stories")
             
             return True
         except Exception as e:
@@ -169,13 +152,11 @@ class EvolutionPipeline:
         """Run ELO tournament."""
         self.log("🏆 Step 2: Running ELO tournament...")
         try:
-            await run_tournament_main()
+            runner = TournamentRunner(self.config)
+            matches_played = await runner.run_tournament()
             
-            # Count matches played (estimate from config)
-            tournament_config = self.config["elo_ranking"]
-            estimated_matches = tournament_config.get("tournament_rounds", 0)
-            self.stats["total_matches_played"] += estimated_matches
-            self.log(f"✅ Tournament completed (~{estimated_matches} matches)")
+            self.stats["total_matches_played"] += matches_played
+            self.log(f"✅ Tournament completed (~{matches_played} matches)")
             
             return True
         except Exception as e:
@@ -186,13 +167,11 @@ class EvolutionPipeline:
         """Generate next batch of stories."""
         self.log("🧬 Step 3: Generating next batch from top performers...")
         try:
-            await generate_next_main()
+            generator = NextBatchGenerator(self.config)
+            stories = await generator.generate_batch()
             
-            # Count new stories generated
-            batch_config = self.config["batch_generation"]
-            estimated_new_stories = batch_config.get("num_stories", 0)
-            self.stats["total_stories_generated"] += estimated_new_stories
-            self.log(f"✅ Generated ~{estimated_new_stories} new story variants")
+            self.stats["total_stories_generated"] += len(stories)
+            self.log(f"✅ Generated {len(stories)} new story variants")
             
             return True
         except Exception as e:
@@ -213,19 +192,14 @@ class EvolutionPipeline:
         iteration_start = time.time()
         self.log_iteration_start(iteration)
         
-        # Step 1: Generate initial batch (only on first iteration and if no existing batches)
         if iteration == 1 and not skip_initial:
             if not await self.run_initial_generation():
                 return False
         elif iteration == 1 and skip_initial:
             self.log("⏭️  Skipping initial generation - using existing batches")
         
-        # Step 2: Run tournament
         if not await self.run_tournament():
             return False
-        
-        # Step 3: Generate next batch (skip on last iteration)
-        # We'll handle this logic in the main loop
         
         iteration_time = time.time() - iteration_start
         self.stats["iteration_times"].append(iteration_time)
@@ -247,19 +221,14 @@ class EvolutionPipeline:
         self.start_time = time.time()
         self.stats["pipeline_start_time"] = datetime.now().isoformat()
         
-        # Get pipeline configuration from config file
         pipeline_config = self.config.get("evolution_pipeline", {})
         
-        # Use config defaults if not overridden
         if max_iterations is None:
             max_iterations = pipeline_config.get("max_iterations", 3)
         if generate_final_batch is None:
             generate_final_batch = pipeline_config.get("generate_final_batch", True)
         
-        # Check if we should auto-continue from existing batches
         auto_continue = pipeline_config.get("auto_continue_from_existing", True)
-        
-        # Check existing state
         latest_batch_number = self.get_latest_batch_number()
         
         self.log(f"🧬 Starting Evolution Pipeline with {max_iterations} iterations")
@@ -279,7 +248,6 @@ class EvolutionPipeline:
         success = True
         
         for iteration in range(1, max_iterations + 1):
-            # Skip initial generation if auto-continue is enabled and batches exist
             skip_initial = auto_continue and (latest_batch_number > 0)
             if not await self.run_iteration(iteration, skip_initial=skip_initial):
                 success = False
@@ -287,7 +255,6 @@ class EvolutionPipeline:
             
             self.stats["iterations_completed"] = iteration
             
-            # Generate next batch after tournament (except after final iteration)
             if iteration < max_iterations or generate_final_batch:
                 if not await self.run_next_generation():
                     success = False
@@ -297,92 +264,3 @@ class EvolutionPipeline:
         self.log_pipeline_summary()
         
         return success
-
-
-async def main():
-    """Main function with command line argument parsing."""
-    parser = argparse.ArgumentParser(description="Run automated story evolution pipeline")
-    parser.add_argument(
-        "--iterations", 
-        type=int, 
-        default=None, 
-        help="Number of evolution iterations to run (default: from config.json)"
-    )
-    parser.add_argument(
-        "--config", 
-        type=str, 
-        default="config.json", 
-        help="Path to configuration file (default: config.json)"
-    )
-    parser.add_argument(
-        "--no-final-batch", 
-        action="store_true", 
-        help="Skip generating final batch after last tournament"
-    )
-    parser.add_argument(
-        "--dry-run", 
-        action="store_true", 
-        help="Show what would be done without actually running"
-    )
-    parser.add_argument(
-        "--fresh-start", 
-        action="store_true", 
-        help="Start fresh even if existing batches are found"
-    )
-    
-    args = parser.parse_args()
-    
-    # Load config to show accurate dry run info
-    if args.dry_run:
-        try:
-            with open(args.config, "r") as f:
-                config = json.load(f)
-            pipeline_config = config.get("evolution_pipeline", {})
-            iterations = args.iterations if args.iterations is not None else pipeline_config.get("max_iterations", 3)
-            print(f"🔍 DRY RUN: Would run {iterations} iterations")
-            if args.iterations is None:
-                print(f"   (using default from {args.config})")
-            print(f"Config file: {args.config}")
-            print(f"Generate final batch: {not args.no_final_batch}")
-            return
-        except Exception as e:
-            print(f"❌ Error reading config for dry run: {e}")
-            return 1
-    
-    # Validate config file exists
-    if not os.path.exists(args.config):
-        print(f"❌ Config file not found: {args.config}")
-        return 1
-    
-    # Initialize and run pipeline
-    pipeline = EvolutionPipeline(args.config)
-    
-    # Override existing batch detection if fresh start requested
-    if args.fresh_start:
-        pipeline.existing_batches = []
-        print("🔄 Fresh start requested - ignoring existing batches")
-    
-    try:
-        success = await pipeline.run_pipeline(
-            max_iterations=args.iterations,
-            generate_final_batch=not args.no_final_batch
-        )
-        
-        if success:
-            print("\n🎉 Evolution pipeline completed successfully!")
-            return 0
-        else:
-            print("\n💥 Evolution pipeline failed!")
-            return 1
-            
-    except KeyboardInterrupt:
-        print("\n⚠️  Pipeline interrupted by user")
-        return 1
-    except Exception as e:
-        print(f"\n💥 Pipeline failed with error: {e}")
-        return 1
-
-
-if __name__ == "__main__":
-    exit_code = asyncio.run(main())
-    sys.exit(exit_code)

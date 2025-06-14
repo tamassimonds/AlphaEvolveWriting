@@ -116,7 +116,7 @@ CRITICAL REMINDERS:
 
 Begin your systematic analysis now:"""
 
-    from utils.inference import generate_text
+    from ..utils.inference import generate_text
     response = await generate_text(judge_model, prompt)
     
     # Parse the response with multiple fallback methods

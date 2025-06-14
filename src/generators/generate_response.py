@@ -398,7 +398,7 @@ Create an engaging, well-written story that captures the essence of the descript
 
 Write only the story - no analysis or commentary needed."""
 
-    from utils.inference import generate_text
+    from ..utils.inference import generate_text
     response = await generate_text(model, prompt, temperature=1)
     return response.strip()
 
@@ -461,7 +461,7 @@ Create a variant that makes MODERATE improvements such as:
 
 Write only the improved story variant - no analysis or commentary needed."""
 
-    from utils.inference import generate_text
+    from ..utils.inference import generate_text
     response = await generate_text(model, prompt, temperature=temperature)
     return response.strip()
 

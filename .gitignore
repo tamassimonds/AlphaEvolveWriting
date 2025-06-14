@@ -14,5 +14,7 @@ __pycache__/
 myenv/
 
 format_for_sft.py
-
+.claude/
 output/train/
+
+alphaevolve_writing.egg-info/

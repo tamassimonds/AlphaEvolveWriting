@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 from dataclasses import dataclass
 
-from lib.judge_response import judge_responses, ModelComparison
+from ..generators.judge_response import judge_responses, ModelComparison
 
 
 @dataclass

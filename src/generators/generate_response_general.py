@@ -375,7 +375,7 @@ Create a clear, well-structured piece that addresses the topic while meeting the
 
 Write only the piece - no analysis or commentary needed."""
 
-    from utils.inference import generate_text
+    from ..utils.inference import generate_text
     response = await generate_text(model, prompt, temperature=1)
     return response.strip()
 
@@ -438,7 +438,7 @@ Create a variant that makes MODERATE improvements such as:
 
 Write only the improved piece variant - no analysis or commentary needed."""
 
-    from utils.inference import generate_text
+    from ..utils.inference import generate_text
     response = await generate_text(model, prompt, temperature=temperature)
     return response.strip()
 
