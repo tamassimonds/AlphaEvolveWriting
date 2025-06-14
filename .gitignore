@@ -16,5 +16,5 @@ myenv/
 format_for_sft.py
 .claude/
 output/train/
-
+uv.lock
 alphaevolve_writing.egg-info/
