@@ -141,6 +141,11 @@ The system supports multiple AI providers configured through `config.json`. The 
       "type": "openai_compatible",
       "base_url": "https://api.deepseek.com/v1",
       "api_key_env": "DEEPSEEK_API_KEY"
+    },
+    "gemini": {
+      "type": "openai_compatible",
+      "api_key_env": "GEMINI_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/"
     }
   },
   "model_provider_mapping": {
@@ -148,7 +153,8 @@ The system supports multiple AI providers configured through `config.json`. The 
     "gpt-3.5-turbo": "openai", 
     "claude-3-sonnet-20240229": "anthropic",
     "meta-llama/Meta-Llama-3-70B-Instruct": "deepinfra",
-    "deepseek-chat": "deepseek"
+    "deepseek-chat": "deepseek",
+    "gemini-2.5-flash": "gemini"
   }
 }
 ```
@@ -160,6 +166,7 @@ export OPENAI_API_KEY="your-openai-key"        # For GPT models
 export ANTHROPIC_API_KEY="your-anthropic-key"  # For Claude models  
 export DEEPINFRA_API_KEY="your-deepinfra-key"  # For Llama models
 export DEEPSEEK_API_KEY="your-deepseek-key"    # For DeepSeek models
+export GEMINI_API_KEY="your-gemini-key"          # For Gemini models
 ```
 
 You only need to set keys for the providers you plan to use. The system automatically routes model requests to the correct provider based on the configuration.
