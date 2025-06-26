@@ -114,18 +114,30 @@ class InitialStoryGenerator(BaseStoryGenerator):
         if os.path.exists(rubric_file):
             shutil.copy2(rubric_file, os.path.join(output_dir, "rubric.txt"))
         
-        print(f"🔄 Generating {batch_config['num_stories']} stories in parallel...")
-        
+        num_stories = batch_config['num_stories']
         tasks = [
             self.generate_single_story(
                 prompt, i, batch_config['model'], 
                 batch_config['initial_elo'], rubric_file
             )
-            for i in range(batch_config['num_stories'])
+            for i in range(num_stories)
         ]
         
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        concurrency_limit = batch_config["max_concurrent_generations"]
         
+        # If limit is 0 or less, process all at once. Otherwise, use a semaphore.
+        if concurrency_limit > 0:
+            print(f"🔄 Generating {num_stories} stories in parallel (concurrency: {concurrency_limit})...")
+            semaphore = asyncio.Semaphore(concurrency_limit)
+            async def wrap_task(task):
+                async with semaphore:
+                    return await task
+            
+            results = await asyncio.gather(*(wrap_task(t) for t in tasks), return_exceptions=True)
+        else:
+            print(f"🔄 Generating {num_stories} stories in parallel (unlimited concurrency)...")
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+
         stories = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
@@ -229,6 +241,7 @@ class NextBatchGenerator(BaseStoryGenerator):
     ) -> Dict[str, Any]:
         """Generate a single story variant with error handling."""
         try:
+            print(f"🧬 Generating variant for story {story_index + 1}, attempt {variant_index + 1}")
             variant_piece = await generate_story_variant(
                 original_story=original_story["piece"],
                 original_prompt=original_story["prompt"],
@@ -269,7 +282,8 @@ class NextBatchGenerator(BaseStoryGenerator):
         model: str,
         initial_elo: int,
         rubric_file: str,
-        temperature: float
+        temperature: float,
+        concurrency_limit: int
     ) -> List[Dict[str, Any]]:
         """Generate all variants for all stories in parallel."""
         total_variants = len(top_stories) * variants_per_story
@@ -290,10 +304,18 @@ class NextBatchGenerator(BaseStoryGenerator):
                 )
                 all_tasks.append(task)
         
-        print(f"Executing {len(all_tasks)} variant generation tasks in parallel...")
-        
-        results = await asyncio.gather(*all_tasks, return_exceptions=True)
-        
+        # If limit is 0 or less, process all at once. Otherwise, use a semaphore.
+        if concurrency_limit > 0:
+            print(f"Executing {len(all_tasks)} variant generation tasks in parallel (concurrency: {concurrency_limit})...")
+            semaphore = asyncio.Semaphore(concurrency_limit)
+            async def wrap_task(task):
+                async with semaphore:
+                    return await task
+            results = await asyncio.gather(*(wrap_task(t) for t in all_tasks), return_exceptions=True)
+        else:
+            print(f"Executing {len(all_tasks)} variant generation tasks in parallel (unlimited concurrency)...")
+            results = await asyncio.gather(*all_tasks, return_exceptions=True)
+
         variants = []
         successful_count = 0
         failed_count = 0
@@ -380,7 +402,8 @@ class NextBatchGenerator(BaseStoryGenerator):
             model=next_batch_config["model"],
             initial_elo=self.config["batch_generation"]["initial_elo"],
             rubric_file=input_config["rubric_file"],
-            temperature=next_batch_config["variant_temperature"]
+            temperature=next_batch_config["variant_temperature"],
+            concurrency_limit=next_batch_config["max_concurrent_generations"]
         )
         
         print(f"\nGenerated {len(all_variants)} total variants")

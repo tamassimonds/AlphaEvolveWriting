@@ -249,7 +249,7 @@ class EloRankingSystem:
         stories: List[Story],
         num_rounds: int,
         judge_model: str,
-        max_concurrent_matches: int = 5,
+        max_concurrent_matches: int = 0,
         min_elo_difference: float = 0,
         stories_file_path: str = None,
         update_after_each_round: bool = True,
@@ -263,7 +263,7 @@ class EloRankingSystem:
             stories: List of stories to compete
             num_rounds: Number of rounds to play
             judge_model: Model to use for judging
-            max_concurrent_matches: Maximum concurrent matches
+            max_concurrent_matches: Maximum concurrent matches. If 0, unlimited.
             min_elo_difference: Minimum ELO difference for matchmaking
             stories_file_path: Path to stories file to update after each round
             update_after_each_round: Whether to update the stories file after each round
@@ -281,16 +281,21 @@ class EloRankingSystem:
         
         print(f"Generated {len(match_pairs)} matches")
         
+        # Determine concurrency. If 0 or less, set to total number of matches for a single batch.
+        concurrency = max_concurrent_matches if max_concurrent_matches > 0 else len(match_pairs)
+        if concurrency == 0: # handle case where there are no matches
+             concurrency = 1
+
         # Run matches in batches to control concurrency
         all_matches = []
-        total_batches = (len(match_pairs) + max_concurrent_matches - 1) // max_concurrent_matches
+        total_batches = (len(match_pairs) + concurrency - 1) // concurrency
         
         print(f"🔢 Total batches to process: {total_batches}")
-        print(f"⚙️  Concurrency setting: {max_concurrent_matches} matches per batch")
+        print(f"⚙️  Concurrency setting: {concurrency} matches per batch")
         
-        for i in range(0, len(match_pairs), max_concurrent_matches):
-            batch = match_pairs[i:i + max_concurrent_matches]
-            batch_num = i//max_concurrent_matches + 1
+        for i in range(0, len(match_pairs), concurrency):
+            batch = match_pairs[i:i + concurrency]
+            batch_num = i//concurrency + 1
             
             print(f"🏆 Running match batch {batch_num}/{total_batches} ({len(batch)} matches)")
             print(f"   Concurrency: {len(batch)} parallel matches")
