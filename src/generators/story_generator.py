@@ -65,7 +65,9 @@ class InitialStoryGenerator(BaseStoryGenerator):
         prompt: str,
         story_index: int,
         model: str,
-        initial_elo: int,
+        initial_rating: float,
+        initial_rd: float,
+        initial_volatility: float,
         rubric_file: str
     ) -> Dict[str, Any]:
         """Generate a single story with error handling."""
@@ -83,7 +85,9 @@ class InitialStoryGenerator(BaseStoryGenerator):
                 "prompt": prompt,
                 "piece": piece,
                 "model_used": model,
-                "elo": initial_elo,
+                "rating": initial_rating,
+                "rd": initial_rd,
+                "sigma": initial_volatility,
                 "created_at": datetime.now().isoformat(),
                 "generation_attempt": story_index + 1
             }
@@ -118,14 +122,16 @@ class InitialStoryGenerator(BaseStoryGenerator):
         tasks = [
             self.generate_single_story(
                 prompt, i, batch_config['model'], 
-                batch_config['initial_elo'], rubric_file
+                batch_config['glicko_initial_rating'], 
+                batch_config['glicko_initial_rd'],
+                batch_config['glicko_initial_volatility'],
+                rubric_file
             )
             for i in range(num_stories)
         ]
         
-        concurrency_limit = batch_config["max_concurrent_generations"]
+        concurrency_limit = self.config["glicko_ranking"].get("max_concurrent_matches", 10)
         
-        # If limit is 0 or less, process all at once. Otherwise, use a semaphore.
         if concurrency_limit > 0:
             print(f"🔄 Generating {num_stories} stories in parallel (concurrency: {concurrency_limit})...")
             semaphore = asyncio.Semaphore(concurrency_limit)
@@ -213,19 +219,19 @@ class NextBatchGenerator(BaseStoryGenerator):
         return data.get("stories", [])
     
     def select_top_stories(self, stories: List[Dict[str, Any]], top_k: int) -> List[Dict[str, Any]]:
-        """Select the top K stories based on ELO rating."""
-        sorted_stories = sorted(stories, key=lambda s: s.get("elo", 0), reverse=True)
+        """Select the top K stories based on Glicko rating."""
+        sorted_stories = sorted(stories, key=lambda s: s.get("rating", 0), reverse=True)
         top_stories = sorted_stories[:top_k]
         
-        print(f"\nSelected top {len(top_stories)} stories by ELO:")
+        print(f"\nSelected top {len(top_stories)} stories by Glicko Rating:")
         for i, story in enumerate(top_stories):
-            elo = story.get("elo", 0)
+            rating = story.get("rating", 0)
             model = story.get("model_used", "unknown")
             story_id = story.get("story_id", "unknown")[:8]
             wins = story.get("wins", 0)
             losses = story.get("losses", 0)
             matches = story.get("matches_played", 0)
-            print(f"  {i+1}. {story_id} (Model: {model}) - ELO: {elo:.1f} | W/L: {wins}/{losses} ({matches} matches)")
+            print(f"  {i+1}. {story_id} (Model: {model}) - Rating: {rating:.1f} | W/L: {wins}/{losses} ({matches} matches)")
         
         return top_stories
     
@@ -235,7 +241,8 @@ class NextBatchGenerator(BaseStoryGenerator):
         variant_index: int,
         story_index: int,
         model: str,
-        initial_elo: int,
+        initial_rd: float,
+        initial_volatility: float,
         rubric_file: str,
         temperature: float
     ) -> Dict[str, Any]:
@@ -255,11 +262,13 @@ class NextBatchGenerator(BaseStoryGenerator):
                 "prompt": original_story["prompt"],
                 "piece": variant_piece,
                 "model_used": model,
-                "elo": initial_elo,
+                "rating": original_story["rating"], # Inherit rating
+                "rd": initial_rd, # Reset RD
+                "sigma": initial_volatility, # Reset volatility
                 "created_at": datetime.now().isoformat(),
                 "generation_type": "variant",
                 "parent_story_id": original_story["story_id"],
-                "parent_elo": original_story["elo"],
+                "parent_rating": original_story["rating"],
                 "parent_wins": original_story.get("wins", 0),
                 "parent_losses": original_story.get("losses", 0),
                 "parent_matches_played": original_story.get("matches_played", 0),
@@ -280,7 +289,8 @@ class NextBatchGenerator(BaseStoryGenerator):
         top_stories: List[Dict[str, Any]],
         variants_per_story: int,
         model: str,
-        initial_elo: int,
+        initial_rd: float,
+        initial_volatility: float,
         rubric_file: str,
         temperature: float,
         concurrency_limit: int
@@ -298,13 +308,13 @@ class NextBatchGenerator(BaseStoryGenerator):
                     variant_index=variant_idx,
                     story_index=story_idx,
                     model=model,
-                    initial_elo=initial_elo,
+                    initial_rd=initial_rd,
+                    initial_volatility=initial_volatility,
                     rubric_file=rubric_file,
                     temperature=temperature
                 )
                 all_tasks.append(task)
         
-        # If limit is 0 or less, process all at once. Otherwise, use a semaphore.
         if concurrency_limit > 0:
             print(f"Executing {len(all_tasks)} variant generation tasks in parallel (concurrency: {concurrency_limit})...")
             semaphore = asyncio.Semaphore(concurrency_limit)
@@ -339,36 +349,41 @@ class NextBatchGenerator(BaseStoryGenerator):
         top_stories: List[Dict[str, Any]],
         variants: List[Dict[str, Any]],
         include_originals: bool,
-        initial_elo: int
+        initial_rd: float,
+        initial_volatility: float
     ) -> List[Dict[str, Any]]:
-        """Prepare the final batch combining original stories and variants with reset ELO."""
+        """Prepare the final batch combining original stories and variants."""
         final_batch = []
         
         if include_originals:
             for story in top_stories:
                 story_copy = story.copy()
                 
-                story_copy["previous_batch_elo"] = story_copy["elo"]
+                story_copy["previous_batch_rating"] = story_copy["rating"]
+                story_copy["previous_batch_rd"] = story_copy["rd"]
                 story_copy["previous_batch_wins"] = story_copy.get("wins", 0)
                 story_copy["previous_batch_losses"] = story_copy.get("losses", 0)
                 story_copy["previous_batch_matches"] = story_copy.get("matches_played", 0)
                 
-                story_copy["elo"] = initial_elo
+                # Inherit rating, but reset RD and volatility
+                story_copy["rd"] = initial_rd
+                story_copy["sigma"] = initial_volatility
+                
                 story_copy["matches_played"] = 0
                 story_copy["wins"] = 0
                 story_copy["losses"] = 0
                 
                 story_copy["generation_type"] = "original_top_performer"
                 story_copy["selected_for_next_batch"] = True
-                story_copy["elo_reset_at"] = datetime.now().isoformat()
+                story_copy["rating_params_reset_at"] = datetime.now().isoformat()
                 
                 final_batch.append(story_copy)
         
         final_batch.extend(variants)
         
         print(f"\nFinal batch composition:")
-        print(f"  Original top stories: {len(top_stories) if include_originals else 0} (ELO reset to {initial_elo})")
-        print(f"  Generated variants: {len(variants)} (ELO set to {initial_elo})")
+        print(f"  Original top stories: {len(top_stories) if include_originals else 0} (RD/Volatility reset)")
+        print(f"  Generated variants: {len(variants)} (Rating inherited, RD/Volatility reset)")
         print(f"  Total stories: {len(final_batch)}")
         
         return final_batch
@@ -376,6 +391,7 @@ class NextBatchGenerator(BaseStoryGenerator):
     async def generate_batch(self) -> List[Dict[str, Any]]:
         """Generate next batch of stories based on top performers."""
         next_batch_config = self.config["next_batch_generation"]
+        batch_config = self.config["batch_generation"]
         output_config = self.config["output"]
         input_config = self.config["input_files"]
         
@@ -387,12 +403,12 @@ class NextBatchGenerator(BaseStoryGenerator):
         stories = self.load_previous_batch(latest_batch_path)
         print(f"Loaded {len(stories)} stories from {os.path.basename(latest_batch_path)}")
         
-        if len(stories) == 0:
+        if not stories:
             raise Exception("No stories found in previous batch!")
         
         top_stories = self.select_top_stories(stories, next_batch_config["top_stories_to_select"])
         
-        if len(top_stories) == 0:
+        if not top_stories:
             raise Exception("No top stories selected!")
         
         print(f"\nGenerating all variants in parallel...")
@@ -400,10 +416,11 @@ class NextBatchGenerator(BaseStoryGenerator):
             top_stories=top_stories,
             variants_per_story=next_batch_config["variants_per_story"],
             model=next_batch_config["model"],
-            initial_elo=self.config["batch_generation"]["initial_elo"],
+            initial_rd=batch_config["glicko_initial_rd"],
+            initial_volatility=batch_config["glicko_initial_volatility"],
             rubric_file=input_config["rubric_file"],
             temperature=next_batch_config["variant_temperature"],
-            concurrency_limit=next_batch_config["max_concurrent_generations"]
+            concurrency_limit=self.config["glicko_ranking"].get("max_concurrent_matches", 10)
         )
         
         print(f"\nGenerated {len(all_variants)} total variants")
@@ -412,22 +429,14 @@ class NextBatchGenerator(BaseStoryGenerator):
             top_stories=top_stories,
             variants=all_variants,
             include_originals=next_batch_config["include_original_stories"],
-            initial_elo=self.config["batch_generation"]["initial_elo"]
+            initial_rd=batch_config["glicko_initial_rd"],
+            initial_volatility=batch_config["glicko_initial_volatility"]
         )
         
         next_batch_filename = self.determine_next_batch_filename()
         output_path = os.path.join(output_config["directory"], next_batch_filename)
         
-        batch_data = {
-            "generated_at": datetime.now().isoformat(),
-            "generation_type": "next_batch",
-            "config_used": next_batch_config,
-            "total_stories": len(final_batch),
-            "stories": final_batch
-        }
-        
-        with open(output_path, "w") as f:
-            json.dump(batch_data, f, indent=2, ensure_ascii=False)
+        self.save_stories(final_batch, output_path, "next_batch")
         
         print(f"\nNext batch generation complete!")
         print(f"Saved {len(final_batch)} stories to: {output_path}")

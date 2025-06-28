@@ -3,7 +3,7 @@ Core Evolution Pipeline
 
 Manages the automated story evolution pipeline:
 1. Generate initial batch of stories
-2. Run ELO tournament to rank them
+2. Run Glicko tournament to rank them
 3. Generate next batch based on top performers
 4. Repeat for N iterations
 """
@@ -149,8 +149,8 @@ class EvolutionPipeline:
             return False
     
     async def run_tournament(self) -> bool:
-        """Run ELO tournament."""
-        self.log("🏆 Step 2: Running ELO tournament...")
+        """Run Glicko-2 tournament."""
+        self.log("🏆 Step 2: Running Glicko-2 tournament...")
         try:
             runner = TournamentRunner(self.config)
             matches_played = await runner.run_tournament()
@@ -233,7 +233,7 @@ class EvolutionPipeline:
         
         self.log(f"🧬 Starting Evolution Pipeline with {max_iterations} iterations")
         self.log(f"Configuration: {self.config['batch_generation']['num_stories']} stories per batch")
-        self.log(f"Tournament: {self.config['elo_ranking']['tournament_rounds']} rounds per tournament")
+        self.log(f"Tournament: {self.config['glicko_ranking']['tournament_rounds']} rounds per tournament")
         
         if self.existing_batches:
             self.log(f"📁 Found {len(self.existing_batches)} existing batch(es)")

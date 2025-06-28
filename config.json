@@ -37,7 +37,10 @@
     "num_stories": 60,
     "model": "gpt-4o",
     "max_attempts": 3,
-    "initial_elo": 1200
+    "glicko_initial_rating": 1500,
+    "glicko_initial_rd": 350,
+    "glicko_initial_volatility": 0.06,
+    "max_concurrent_generations": 0
   },
   "next_batch_generation": {
     "top_stories_to_select": 5,
@@ -45,14 +48,14 @@
     "model": "gpt-4o",
     "max_attempts": 3,
     "include_original_stories": true,
-    "variant_temperature": 1.2
+    "variant_temperature": 1.2,
+    "max_concurrent_generations": 0
   },
-  "elo_ranking": {
-    "k_factor": 32,
+  "glicko_ranking": {
+    "tau": 0.5,
     "judge_model": "gpt-4o",
     "tournament_rounds": 20,
     "max_concurrent_matches": 60,
-    "min_elo_difference": 0,
     "save_match_history": true,
     "update_rankings_after_each_round": true
   },
@@ -70,7 +73,7 @@
     "directory": "output",
     "stories_file": "initial_stories.json",
     "next_batch_file": "batch2_stories.json",
-    "elo_results_file": "elo_rankings.json",
+    "elo_results_file": "glicko_rankings.json",
     "match_history_file": "match_history.json"
   }
 }

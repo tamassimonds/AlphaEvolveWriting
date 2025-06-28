@@ -1,7 +1,7 @@
 """
 Tournament Runner Module
 
-Handles ELO tournament operations for ranking stories.
+Handles Glicko-2 tournament operations for ranking stories.
 """
 
 import asyncio
@@ -11,11 +11,11 @@ import glob
 from typing import List, Dict, Any
 from datetime import datetime
 
-from .elo_rank import EloRankingSystem, load_stories_from_json
+from .glicko_rank import GlickoRankingSystem, load_stories_from_json
 
 
 class TournamentRunner:
-    """Manages ELO tournament operations."""
+    """Manages Glicko-2 tournament operations."""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
@@ -48,78 +48,106 @@ class TournamentRunner:
         
         return most_recent
     
+    def _update_stories_file(self, stories: List[Dict[str, Any]], stories_file_path: str):
+        """Update the stories file with current Glicko ratings and match stats."""
+        try:
+            with open(stories_file_path, "r") as f:
+                original_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            original_data = {"stories": []}
+            
+        story_map = {story['story_id']: story for story in stories}
+        
+        updated_stories = []
+        for story_data in original_data.get("stories", []):
+            story_id = story_data.get("story_id")
+            if story_id in story_map:
+                updated_story = story_map[story_id]
+                story_data.update(updated_story)
+            updated_stories.append(story_data)
+
+        original_data["stories"] = updated_stories
+        original_data["last_rating_update"] = datetime.now().isoformat()
+
+        with open(stories_file_path, "w") as f:
+            json.dump(original_data, f, indent=2)
+
     async def run_tournament(self) -> int:
-        """Run ELO tournament and return number of matches played."""
-        elo_config = self.config["elo_ranking"]
+        """Run Glicko-2 tournament and return number of matches played."""
+        glicko_config = self.config["glicko_ranking"]
+        batch_config = self.config["batch_generation"]
         output_config = self.config["output"]
         
-        print("Starting ELO Tournament System")
-        print(f"Configuration: K-factor={elo_config['k_factor']}, Rounds={elo_config['tournament_rounds']}")
+        print("Starting Glicko-2 Tournament System")
+        print(f"Configuration: Tau={glicko_config['tau']}, Rounds={glicko_config['tournament_rounds']}")
         
         output_dir = output_config["directory"]
         stories_path = self.find_most_recent_batch(output_dir)
         
-        stories = load_stories_from_json(stories_path)
+        stories = load_stories_from_json(
+            stories_path,
+            default_rating=batch_config['glicko_initial_rating'],
+            default_rd=batch_config['glicko_initial_rd'],
+            default_sigma=batch_config['glicko_initial_volatility']
+        )
         print(f"Loaded {len(stories)} stories from {os.path.basename(stories_path)}")
         
         if len(stories) < 2:
-            raise Exception("Need at least 2 stories to run tournament")
+            print("Warning: Need at least 2 stories to run tournament. Skipping.")
+            return 0
+        
+        # Capture initial ratings for change calculation
+        initial_ratings = {story.story_id: story.rating for story in stories}
         
         original_prompt = None
-        with open(stories_path, "r") as f:
-            stories_data = json.load(f)
-            if "stories" in stories_data and len(stories_data["stories"]) > 0:
-                original_prompt = stories_data["stories"][0].get("prompt")
+        if stories:
+            # A bit of a hack to get prompt from the first story's data
+            with open(stories_path, "r") as f:
+                data = json.load(f)
+                story_data = next((s for s in data.get("stories", []) if s.get("story_id") == stories[0].story_id), None)
+                if story_data:
+                    original_prompt = story_data.get("prompt")
         
-        if original_prompt:
-            print(f"Using original prompt: {original_prompt[:100]}...")
-        else:
-            print("Warning: No original prompt found in stories data")
+        print("\nInitial Glicko Standings:")
+        for i, story in enumerate(sorted(stories, key=lambda s: s.rating, reverse=True)[:10]):
+            print(f"  {i+1}. {story.story_id[:8]} (Model: {story.model_used}) - Rating: {story.rating:.1f} (RD: {story.rd:.1f})")
         
-        print("\nInitial ELO Standings:")
-        for i, story in enumerate(sorted(stories, key=lambda s: s.elo, reverse=True)):
-            print(f"  {i+1}. {story.story_id[:8]} (Model: {story.model_used}) - ELO: {story.elo}")
-        
-        elo_system = EloRankingSystem(k_factor=elo_config["k_factor"])
+        glicko_system = GlickoRankingSystem(tau=glicko_config["tau"])
         
         rubric_file = self.config["input_files"]["rubric_file"]
-        print(f"Using rubric from: {rubric_file}")
         
         print(f"\nStarting tournament...")
-        matches = await elo_system.run_tournament(
+        matches_played = await glicko_system.run_tournament(
             stories=stories,
-            num_rounds=elo_config["tournament_rounds"],
-            judge_model=elo_config["judge_model"],
-            max_concurrent_matches=elo_config["max_concurrent_matches"],
-            min_elo_difference=elo_config["min_elo_difference"],
-            stories_file_path=stories_path,
-            update_after_each_round=elo_config["update_rankings_after_each_round"],
+            num_rounds=glicko_config["tournament_rounds"],
+            judge_model=glicko_config["judge_model"],
+            max_concurrent_matches=glicko_config["max_concurrent_matches"],
             rubric_file=rubric_file,
             original_prompt=original_prompt
         )
         
-        print(f"\nTournament Complete! {len(matches)} matches played")
-        print("\nFinal ELO Standings:")
+        print("\nTournament Complete! {len(matches_played)} matches played")
+        print("\nFinal Glicko Standings:")
         
-        leaderboard = elo_system.get_leaderboard(stories)
-        for entry in leaderboard:
-            print(f"  {entry['rank']}. {entry['story_id'][:8]} (Model: {entry['model_used']}) - "
-                  f"ELO: {entry['elo']} | W/L: {entry['wins']}/{entry['losses']} "
+        leaderboard = glicko_system.get_leaderboard(stories)
+        for entry in leaderboard[:15]: # Show top 15
+            print(f"  {entry['rank']}. {entry['story_id'][:8]} (M: {entry['model_used']}) - "
+                  f"Rating: {entry['rating']:.1f} (±{entry['rd']:.0f}) | W/L: {entry['wins']}/{entry['losses']} "
                   f"({entry['win_rate']:.1%})")
         
-        print("\nBiggest ELO Changes:")
-        elo_changes = []
+        print("\nBiggest Rating Changes:")
+        rating_changes = []
         for story in stories:
-            original_elo = self.config["batch_generation"]["initial_elo"]
-            change = story.elo - original_elo
-            elo_changes.append((story, change))
+            initial_rating = initial_ratings.get(story.story_id, batch_config['glicko_initial_rating'])
+            change = story.rating - initial_rating
+            rating_changes.append((story, change))
         
-        elo_changes.sort(key=lambda x: abs(x[1]), reverse=True)
+        rating_changes.sort(key=lambda x: abs(x[1]), reverse=True)
         
-        for i, (story, change) in enumerate(elo_changes[:5]):
+        for i, (story, change) in enumerate(rating_changes[:5]):
             direction = "UP" if change > 0 else "DOWN"
-            print(f"  {direction}: {story.story_id[:8]} (Model: {story.model_used}): "
-                  f"{change:+.1f} (Now: {story.elo:.1f})")
+            print(f"  {direction}: {story.story_id[:8]} (M: {story.model_used}): "
+                  f"{change:+.1f} (Now: {story.rating:.1f})")
         
         print("\nModel Performance Summary:")
         model_stats = {}
@@ -127,68 +155,35 @@ class TournamentRunner:
             model = story.model_used
             if model not in model_stats:
                 model_stats[model] = {
-                    'count': 0, 'total_elo': 0, 'total_wins': 0, 
-                    'total_matches': 0, 'stories': []
+                    'count': 0, 'total_rating': 0, 'total_wins': 0, 
+                    'total_matches': 0
                 }
             
             stats = model_stats[model]
             stats['count'] += 1
-            stats['total_elo'] += story.elo
+            stats['total_rating'] += story.rating
             stats['total_wins'] += story.wins
             stats['total_matches'] += story.matches_played
-            stats['stories'].append(story)
         
         for model, stats in model_stats.items():
-            avg_elo = stats['total_elo'] / stats['count']
-            win_rate = stats['total_wins'] / stats['total_matches'] if stats['total_matches'] > 0 else 0
-            print(f"  {model}: Avg ELO: {avg_elo:.1f}, Win Rate: {win_rate:.1%}, Stories: {stats['count']}")
-        
+            if stats['count'] > 0:
+                avg_rating = stats['total_rating'] / stats['count']
+                win_rate = stats['total_wins'] / stats['total_matches'] if stats['total_matches'] > 0 else 0
+                print(f"  - {model}: Avg Rating: {avg_rating:.1f}, Win Rate: {win_rate:.1%}, Stories: {stats['count']}")
+
+        updated_story_data = [s.__dict__ for s in stories]
+        self._update_stories_file(updated_story_data, stories_path)
+        print(f"\nUpdated stories file with new ratings: {stories_path}")
+
         print(f"\nSaving results...")
-        elo_system.save_results(
+        glicko_system.save_results(
             stories=stories,
             output_dir=output_config["directory"],
-            elo_results_file=output_config["elo_results_file"],
-            match_history_file=output_config["match_history_file"],
-            save_match_history=elo_config["save_match_history"]
+            results_file=output_config["elo_results_file"],
+            history_file=output_config["match_history_file"],
+            save_history=glicko_config["save_match_history"]
         )
         
-        updated_stories_data = {
-            "generated_at": None,
-            "tournament_completed_at": elo_system.match_history[-1].timestamp if elo_system.match_history else None,
-            "total_stories": len(stories),
-            "stories": [
-                {
-                    "story_id": story.story_id,
-                    "prompt": None,
-                    "piece": story.piece,
-                    "model_used": story.model_used,
-                    "elo": story.elo,
-                    "created_at": None,
-                    "generation_attempt": None,
-                    "matches_played": story.matches_played,
-                    "wins": story.wins,
-                    "losses": story.losses
-                }
-                for story in stories
-            ]
-        }
-        
-        with open(stories_path, "r") as f:
-            original_data = json.load(f)
-        
-        updated_stories_data["generated_at"] = original_data.get("generated_at")
-        
-        for i, original_story in enumerate(original_data.get("stories", [])):
-            if i < len(updated_stories_data["stories"]):
-                updated_story = updated_stories_data["stories"][i]
-                updated_story["prompt"] = original_story.get("prompt")
-                updated_story["created_at"] = original_story.get("created_at")
-                updated_story["generation_attempt"] = original_story.get("generation_attempt")
-        
-        with open(stories_path, "w") as f:
-            json.dump(updated_stories_data, f, indent=2)
-        
-        print(f"Updated stories file with new ELO ratings: {stories_path}")
         print(f"\nTournament complete! Check {output_config['directory']} for detailed results.")
         
-        return len(matches)
+        return matches_played
