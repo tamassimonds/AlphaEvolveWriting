@@ -126,7 +126,22 @@ class TournamentRunner:
             original_prompt=original_prompt
         )
         
-        print("\nTournament Complete! {len(matches_played)} matches played")
+        parent_stories = [s for s in stories if hasattr(s, 'previous_batch_rating') and s.previous_batch_rating is not None]
+
+        if parent_stories:
+            print("\n🔄 Normalizing ratings to prevent score drift...")
+            rating_diffs = [s.rating - s.previous_batch_rating for s in parent_stories]
+            
+            if rating_diffs:
+                average_drift = sum(rating_diffs) / len(rating_diffs)
+                print(f"  - Average rating drift of parents: {average_drift:+.1f} points.")
+                
+                for story in stories:
+                    story.rating -= average_drift
+                    story._mu = (story.rating - 1500) / 173.7178
+                print(f"  - All {len(stories)} story ratings in this batch have been adjusted to compensate.")
+        
+        print(f"\nTournament Complete! {matches_played} matches played")
         print("\nFinal Glicko Standings:")
         
         leaderboard = glicko_system.get_leaderboard(stories)

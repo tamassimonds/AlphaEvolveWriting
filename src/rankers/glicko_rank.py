@@ -42,6 +42,7 @@ class Story:
     rd: float = 350.0
     sigma: float = 0.06
     
+    previous_batch_rating: Optional[float] = None
     matches_played: int = 0
     wins: int = 0
     losses: int = 0
@@ -318,6 +319,7 @@ def load_stories_from_json(json_path: str, default_rating: float, default_rd: fl
             rating=story_data.get("rating", story_data.get("elo", default_rating)),
             rd=story_data.get("rd", default_rd),
             sigma=story_data.get("sigma", default_sigma),
+            previous_batch_rating=story_data.get("previous_batch_rating"),
             matches_played=story_data.get("matches_played", 0),
             wins=story_data.get("wins", 0),
             losses=story_data.get("losses", 0)
