@@ -7,117 +7,80 @@ Handles Glicko-2 tournament operations for ranking stories.
 import asyncio
 import json
 import os
-import glob
+import sqlite3
 from typing import List, Dict, Any
 from datetime import datetime
 
-from .glicko_rank import GlickoRankingSystem, load_stories_from_json
+from .glicko_rank import GlickoRankingSystem, load_stories_from_db, Story
 
 
 class TournamentRunner:
     """Manages Glicko-2 tournament operations."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], db_connection: sqlite3.Connection):
         self.config = config
+        self.conn = db_connection
     
-    def find_most_recent_batch(self, output_dir: str) -> str:
-        """Find the most recent batch file based on modification time."""
-        batch_patterns = ["batch*_stories.json", "*stories.json"]
-        
-        all_batch_files = []
-        for pattern in batch_patterns:
-            pattern_path = os.path.join(output_dir, pattern)
-            files = glob.glob(pattern_path)
-            all_batch_files.extend(files)
-        
-        if not all_batch_files:
-            raise FileNotFoundError(f"No batch files found in {output_dir}")
-        
-        all_batch_files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
-        
-        most_recent = all_batch_files[0]
-        print(f"Found {len(all_batch_files)} batch files, using most recent: {os.path.basename(most_recent)}")
-        
-        if len(all_batch_files) > 1:
-            print("Available batch files (by modification time):")
-            for i, file_path in enumerate(all_batch_files):
-                mtime = os.path.getmtime(file_path)
-                mtime_str = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
-                status = "← USING" if i == 0 else ""
-                print(f"  {os.path.basename(file_path)} ({mtime_str}) {status}")
-        
-        return most_recent
-    
-    def _update_stories_file(self, stories: List[Dict[str, Any]], stories_file_path: str):
-        """Update the stories file with current Glicko ratings and match stats."""
-        try:
-            with open(stories_file_path, "r") as f:
-                original_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            original_data = {"stories": []}
-            
-        story_map = {story['story_id']: story for story in stories}
-        
-        updated_stories = []
-        for story_data in original_data.get("stories", []):
-            story_id = story_data.get("story_id")
-            if story_id in story_map:
-                updated_story = story_map[story_id]
-                story_data.update(updated_story)
-            updated_stories.append(story_data)
+    def _get_latest_batch_number(self) -> int:
+        """Find the most recent batch number from the database."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT MAX(batch_number) FROM stories")
+        result = cursor.fetchone()
+        return result[0] if result and result[0] is not None else -1
 
-        original_data["stories"] = updated_stories
-        original_data["last_rating_update"] = datetime.now().isoformat()
-
-        with open(stories_file_path, "w") as f:
-            json.dump(original_data, f, indent=2)
+    def _update_stories_in_db(self, stories: List[Story]):
+        """Update the stories in the database with current Glicko ratings and match stats."""
+        cursor = self.conn.cursor()
+        update_data = [
+            (s.rating, s.rd, s.sigma, s.matches_played, s.wins, s.losses, s.story_id)
+            for s in stories
+        ]
+        cursor.executemany("""
+            UPDATE stories
+            SET rating = ?, rd = ?, sigma = ?, matches_played = ?, wins = ?, losses = ?
+            WHERE story_id = ?
+        """, update_data)
+        self.conn.commit()
+        print(f"\nUpdated {len(stories)} stories in the database with new ratings.")
 
     async def run_tournament(self) -> int:
         """Run Glicko-2 tournament and return number of matches played."""
         glicko_config = self.config["glicko_ranking"]
         batch_config = self.config["batch_generation"]
-        output_config = self.config["output"]
         
         print("Starting Glicko-2 Tournament System")
         print(f"Configuration: Tau={glicko_config['tau']}, Rounds={glicko_config['tournament_rounds']}")
         
-        output_dir = output_config["directory"]
-        stories_path = self.find_most_recent_batch(output_dir)
+        latest_batch_number = self._get_latest_batch_number()
+        if latest_batch_number == -1:
+            print("Warning: No batches found in the database. Skipping tournament.")
+            return 0
         
-        stories = load_stories_from_json(
-            stories_path,
-            default_rating=batch_config['glicko_initial_rating'],
-            default_rd=batch_config['glicko_initial_rd'],
-            default_sigma=batch_config['glicko_initial_volatility']
-        )
-        print(f"Loaded {len(stories)} stories from {os.path.basename(stories_path)}")
+        stories = load_stories_from_db(self.conn, latest_batch_number)
+        print(f"Loaded {len(stories)} stories from batch {latest_batch_number}")
         
         if len(stories) < 2:
             print("Warning: Need at least 2 stories to run tournament. Skipping.")
             return 0
         
-        # Capture initial ratings for change calculation
         initial_ratings = {story.story_id: story.rating for story in stories}
         
-        original_prompt = None
-        if stories:
-            # A bit of a hack to get prompt from the first story's data
-            with open(stories_path, "r") as f:
-                data = json.load(f)
-                story_data = next((s for s in data.get("stories", []) if s.get("story_id") == stories[0].story_id), None)
-                if story_data:
-                    original_prompt = story_data.get("prompt")
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT prompt FROM stories WHERE batch_number = ? LIMIT 1", (latest_batch_number,))
+        res = cursor.fetchone()
+        original_prompt = res['prompt'] if res else None
         
         print("\nInitial Glicko Standings:")
         for i, story in enumerate(sorted(stories, key=lambda s: s.rating, reverse=True)[:10]):
             print(f"  {i+1}. {story.story_id[:8]} (Model: {story.model_used}) - Rating: {story.rating:.1f} (RD: {story.rd:.1f})")
         
-        glicko_system = GlickoRankingSystem(tau=glicko_config["tau"])
+        glicko_system = GlickoRankingSystem(config=self.config, tau=glicko_config['tau'])
         
         rubric_file = self.config["input_files"]["rubric_file"]
         
         print(f"\nStarting tournament...")
         matches_played = await glicko_system.run_tournament(
+            conn=self.conn,
             stories=stories,
             num_rounds=glicko_config["tournament_rounds"],
             judge_model=glicko_config["judge_model"],
@@ -126,7 +89,7 @@ class TournamentRunner:
             original_prompt=original_prompt
         )
         
-        parent_stories = [s for s in stories if hasattr(s, 'previous_batch_rating') and s.previous_batch_rating is not None]
+        parent_stories = [s for s in stories if s.previous_batch_rating is not None]
 
         if parent_stories:
             print("\n🔄 Normalizing ratings to prevent score drift...")
@@ -180,25 +143,14 @@ class TournamentRunner:
             stats['total_wins'] += story.wins
             stats['total_matches'] += story.matches_played
         
-        for model, stats in model_stats.items():
+        for model, stats in sorted(model_stats.items()):
             if stats['count'] > 0:
                 avg_rating = stats['total_rating'] / stats['count']
                 win_rate = stats['total_wins'] / stats['total_matches'] if stats['total_matches'] > 0 else 0
                 print(f"  - {model}: Avg Rating: {avg_rating:.1f}, Win Rate: {win_rate:.1%}, Stories: {stats['count']}")
 
-        updated_story_data = [s.__dict__ for s in stories]
-        self._update_stories_file(updated_story_data, stories_path)
-        print(f"\nUpdated stories file with new ratings: {stories_path}")
-
-        print(f"\nSaving results...")
-        glicko_system.save_results(
-            stories=stories,
-            output_dir=output_config["directory"],
-            results_file=output_config["elo_results_file"],
-            history_file=output_config["match_history_file"],
-            save_history=glicko_config["save_match_history"]
-        )
+        self._update_stories_in_db(stories)
         
-        print(f"\nTournament complete! Check {output_config['directory']} for detailed results.")
+        print(f"\nTournament complete! All results saved to the database.")
         
         return matches_played

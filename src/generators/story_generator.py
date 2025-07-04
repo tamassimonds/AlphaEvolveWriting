@@ -8,13 +8,11 @@ import asyncio
 import json
 import os
 import uuid
-import glob
 import re
+import sqlite3
+import shutil
 from datetime import datetime
 from typing import List, Dict, Any
-import shutil
-
-import os
 
 # Conditional import based on USE_GENERAL_MODE environment variable
 if os.environ.get('USE_GENERAL_MODE'):
@@ -26,8 +24,9 @@ else:
 class BaseStoryGenerator:
     """Base class for story generators."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], db_connection: sqlite3.Connection):
         self.config = config
+        self.conn = db_connection
     
     def load_prompt(self, prompt_file: str) -> str:
         """Load the story prompt from file."""
@@ -44,17 +43,33 @@ class BaseStoryGenerator:
         if os.path.exists(prompt_file):
             shutil.copy2(prompt_file, os.path.join(output_dir, "prompt.txt"))
     
-    def save_stories(self, stories: List[Dict[str, Any]], output_path: str, generation_type: str = "initial") -> None:
-        """Save stories to JSON file."""
-        batch_data = {
-            "generated_at": datetime.now().isoformat(),
-            "generation_type": generation_type,
-            "total_stories": len(stories),
-            "stories": stories
-        }
+    def _insert_new_stories_to_db(self, stories: List[Dict[str, Any]], batch_number: int):
+        """Save a batch of new stories to the database."""
+        cursor = self.conn.cursor()
         
-        with open(output_path, "w") as f:
-            json.dump(batch_data, f, indent=2, ensure_ascii=False)
+        story_data_to_insert = []
+        for story in stories:
+            story['batch_number'] = batch_number
+            story_data_to_insert.append(
+                (
+                    story.get("story_id"), story.get("batch_number"), story.get("piece"),
+                    story.get("prompt"), story.get("model_used"), story.get("rating"),
+                    story.get("rd"), story.get("sigma"), story.get("created_at"),
+                    story.get("generation_type"), story.get("parent_story_id"),
+                    story.get("matches_played", 0), story.get("wins", 0), story.get("losses", 0),
+                    story.get("previous_batch_rating")
+                )
+            )
+        
+        cursor.executemany("""
+            INSERT INTO stories (
+                story_id, batch_number, piece, prompt, model_used, rating, rd, sigma, 
+                created_at, generation_type, parent_story_id, matches_played, wins, losses,
+                previous_batch_rating
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, story_data_to_insert)
+        
+        self.conn.commit()
 
 
 class InitialStoryGenerator(BaseStoryGenerator):
@@ -89,6 +104,7 @@ class InitialStoryGenerator(BaseStoryGenerator):
                 "rd": initial_rd,
                 "sigma": initial_volatility,
                 "created_at": datetime.now().isoformat(),
+                "generation_type": "initial",
                 "generation_attempt": story_index + 1
             }
             
@@ -144,21 +160,15 @@ class InitialStoryGenerator(BaseStoryGenerator):
             print(f"🔄 Generating {num_stories} stories in parallel (unlimited concurrency)...")
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        stories = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                print(f"❌ Story {i + 1} failed with exception: {result}")
-            elif result is not None:
-                stories.append(result)
+        stories = [res for res in results if res is not None and not isinstance(res, Exception)]
         
         if not stories:
             raise Exception("No stories were successfully generated!")
         
-        output_path = os.path.join(output_dir, output_config["stories_file"])
-        self.save_stories(stories, output_path, "initial")
+        # The first batch is always batch 0
+        self._insert_new_stories_to_db(stories, batch_number=0)
         
-        print(f"✅ Successfully generated {len(stories)} stories!")
-        print(f"📄 Stories saved to: {output_path}")
+        print(f"✅ Successfully generated and saved {len(stories)} stories to database (batch 0)!")
         
         return stories
 
@@ -166,58 +176,62 @@ class InitialStoryGenerator(BaseStoryGenerator):
 class NextBatchGenerator(BaseStoryGenerator):
     """Generates next batch of stories based on top performers."""
     
-    def find_latest_batch_file(self) -> str:
-        """Find the most recent batch file based on modification time."""
-        output_dir = self.config["output"]["directory"]
-        
-        batch_patterns = ["batch*_stories.json", "*stories.json"]
-        
-        all_batch_files = []
-        for pattern in batch_patterns:
-            pattern_path = os.path.join(output_dir, pattern)
-            files = glob.glob(pattern_path)
-            all_batch_files.extend(files)
-        
-        if not all_batch_files:
-            raise FileNotFoundError(f"No batch files found in {output_dir}")
-        
-        all_batch_files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
-        
-        latest_file = all_batch_files[0]
-        print(f"Found latest batch file: {os.path.basename(latest_file)}")
-        return latest_file
+    def _get_latest_batch_number(self) -> int:
+        """Find the most recent batch number from the database."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT MAX(batch_number) FROM stories")
+        result = cursor.fetchone()
+        return result[0] if result and result[0] is not None else -1
     
-    def determine_next_batch_filename(self) -> str:
-        """Determine the filename for the next batch based on existing files."""
-        output_dir = self.config["output"]["directory"]
+    def _load_stories_from_batch(self, batch_number: int) -> List[Dict[str, Any]]:
+        """Load stories from a specific batch in the database."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM stories WHERE batch_number = ?", (batch_number,))
+        rows = cursor.fetchall()
+        if not rows:
+            raise FileNotFoundError(f"No stories found for batch {batch_number} in the database.")
+        return [dict(row) for row in rows]
+
+    def _promote_stories_to_new_batch(
+        self, 
+        top_stories: List[Dict[str, Any]], 
+        next_batch_number: int,
+        initial_rd: float,
+        initial_volatility: float
+    ):
+        """
+        Updates existing top stories to be part of the next batch, resetting their
+        tournament stats.
+        """
+        cursor = self.conn.cursor()
+        update_data = [
+            (
+                next_batch_number,
+                initial_rd,
+                initial_volatility,
+                "original_top_performer",
+                story['rating'], # Set previous_batch_rating to current rating
+                story['story_id']
+            ) for story in top_stories
+        ]
         
-        batch_files = glob.glob(os.path.join(output_dir, "batch*_stories.json"))
+        cursor.executemany("""
+            UPDATE stories
+            SET 
+                batch_number = ?,
+                rd = ?,
+                sigma = ?,
+                generation_type = ?,
+                previous_batch_rating = ?,
+                matches_played = 0,
+                wins = 0,
+                losses = 0
+            WHERE story_id = ?
+        """, update_data)
         
-        max_batch_num = 1
-        
-        for file_path in batch_files:
-            filename = os.path.basename(file_path)
-            match = re.search(r'batch(\d+)_stories\.json', filename)
-            if match:
-                batch_num = int(match.group(1))
-                max_batch_num = max(max_batch_num, batch_num)
-        
-        next_batch_num = max_batch_num + 1
-        next_filename = f"batch{next_batch_num}_stories.json"
-        
-        print(f"Next batch will be saved as: {next_filename}")
-        return next_filename
-    
-    def load_previous_batch(self, stories_path: str) -> List[Dict[str, Any]]:
-        """Load stories from the previous batch."""
-        if not os.path.exists(stories_path):
-            raise FileNotFoundError(f"Previous batch file not found: {stories_path}")
-        
-        with open(stories_path, "r") as f:
-            data = json.load(f)
-        
-        return data.get("stories", [])
-    
+        self.conn.commit()
+        print(f"✅ Promoted {len(top_stories)} top stories to batch {next_batch_number}")
+
     def select_top_stories(self, stories: List[Dict[str, Any]], top_k: int) -> List[Dict[str, Any]]:
         """Select the top K stories based on Glicko rating."""
         sorted_stories = sorted(stories, key=lambda s: s.get("rating", 0), reverse=True)
@@ -268,12 +282,7 @@ class NextBatchGenerator(BaseStoryGenerator):
                 "created_at": datetime.now().isoformat(),
                 "generation_type": "variant",
                 "parent_story_id": original_story["story_id"],
-                "parent_rating": original_story["rating"],
-                "parent_wins": original_story.get("wins", 0),
-                "parent_losses": original_story.get("losses", 0),
-                "parent_matches_played": original_story.get("matches_played", 0),
-                "variant_index": variant_index + 1,
-                "parent_story_index": story_index + 1,
+                "previous_batch_rating": original_story["rating"], # Inherit parent's rating as previous
                 "matches_played": 0,
                 "wins": 0,
                 "losses": 0
@@ -344,74 +353,29 @@ class NextBatchGenerator(BaseStoryGenerator):
         
         return variants
     
-    def prepare_final_batch(
-        self,
-        top_stories: List[Dict[str, Any]],
-        variants: List[Dict[str, Any]],
-        include_originals: bool,
-        initial_rd: float,
-        initial_volatility: float
-    ) -> List[Dict[str, Any]]:
-        """Prepare the final batch combining original stories and variants."""
-        final_batch = []
-        
-        if include_originals:
-            for story in top_stories:
-                story_copy = story.copy()
-                
-                story_copy["previous_batch_rating"] = story_copy["rating"]
-                story_copy["previous_batch_rd"] = story_copy["rd"]
-                story_copy["previous_batch_wins"] = story_copy.get("wins", 0)
-                story_copy["previous_batch_losses"] = story_copy.get("losses", 0)
-                story_copy["previous_batch_matches"] = story_copy.get("matches_played", 0)
-                
-                # Inherit rating, but reset RD and volatility
-                story_copy["rd"] = initial_rd
-                story_copy["sigma"] = initial_volatility
-                
-                story_copy["matches_played"] = 0
-                story_copy["wins"] = 0
-                story_copy["losses"] = 0
-                
-                story_copy["generation_type"] = "original_top_performer"
-                story_copy["selected_for_next_batch"] = True
-                story_copy["rating_params_reset_at"] = datetime.now().isoformat()
-                
-                final_batch.append(story_copy)
-        
-        final_batch.extend(variants)
-        
-        print(f"\nFinal batch composition:")
-        print(f"  Original top stories: {len(top_stories) if include_originals else 0} (RD/Volatility reset)")
-        print(f"  Generated variants: {len(variants)} (Rating inherited, RD/Volatility reset)")
-        print(f"  Total stories: {len(final_batch)}")
-        
-        return final_batch
-    
     async def generate_batch(self) -> List[Dict[str, Any]]:
         """Generate next batch of stories based on top performers."""
         next_batch_config = self.config["next_batch_generation"]
         batch_config = self.config["batch_generation"]
-        output_config = self.config["output"]
         input_config = self.config["input_files"]
         
         print("Starting Next Batch Generation System")
         print(f"Configuration: Top {next_batch_config['top_stories_to_select']} stories, "
               f"{next_batch_config['variants_per_story']} variants each")
         
-        latest_batch_path = self.find_latest_batch_file()
-        stories = self.load_previous_batch(latest_batch_path)
-        print(f"Loaded {len(stories)} stories from {os.path.basename(latest_batch_path)}")
+        latest_batch_number = self._get_latest_batch_number()
+        if latest_batch_number == -1:
+            raise Exception("Cannot generate next batch, no initial batch found in database.")
         
-        if not stories:
-            raise Exception("No stories found in previous batch!")
+        stories = self._load_stories_from_batch(latest_batch_number)
+        print(f"Loaded {len(stories)} stories from batch {latest_batch_number} in database")
         
         top_stories = self.select_top_stories(stories, next_batch_config["top_stories_to_select"])
         
         if not top_stories:
             raise Exception("No top stories selected!")
         
-        print(f"\nGenerating all variants in parallel...")
+        print(f"\nGenerating new variants in parallel...")
         all_variants = await self.generate_all_variants_parallel(
             top_stories=top_stories,
             variants_per_story=next_batch_config["variants_per_story"],
@@ -423,22 +387,28 @@ class NextBatchGenerator(BaseStoryGenerator):
             concurrency_limit=self.config["glicko_ranking"].get("max_concurrent_matches", 10)
         )
         
-        print(f"\nGenerated {len(all_variants)} total variants")
+        print(f"\nGenerated {len(all_variants)} total new variants")
         
-        final_batch = self.prepare_final_batch(
-            top_stories=top_stories,
-            variants=all_variants,
-            include_originals=next_batch_config["include_original_stories"],
-            initial_rd=batch_config["glicko_initial_rd"],
-            initial_volatility=batch_config["glicko_initial_volatility"]
-        )
+        next_batch_number = latest_batch_number + 1
         
-        next_batch_filename = self.determine_next_batch_filename()
-        output_path = os.path.join(output_config["directory"], next_batch_filename)
+        # Insert the new variants into the database
+        if all_variants:
+            self._insert_new_stories_to_db(all_variants, batch_number=next_batch_number)
+            print(f"✅ Inserted {len(all_variants)} new variants into database as batch {next_batch_number}")
         
-        self.save_stories(final_batch, output_path, "next_batch")
+        # Promote the original top stories to the new batch if configured to do so
+        if next_batch_config["include_original_stories"]:
+            self._promote_stories_to_new_batch(
+                top_stories, 
+                next_batch_number,
+                batch_config["glicko_initial_rd"],
+                batch_config["glicko_initial_volatility"]
+            )
+        
+        final_batch_size = len(all_variants) + (len(top_stories) if next_batch_config["include_original_stories"] else 0)
         
         print(f"\nNext batch generation complete!")
-        print(f"Saved {len(final_batch)} stories to: {output_path}")
+        print(f"Created batch {next_batch_number} with {final_batch_size} total stories.")
         
-        return final_batch
+        # Return the combination of promoted stories and new variants for the pipeline stats
+        return top_stories + all_variants
