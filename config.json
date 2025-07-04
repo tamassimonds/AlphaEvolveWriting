@@ -22,11 +22,6 @@
       "type": "openai_compatible",
       "api_key_env": "GEMINI_API_KEY",
       "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/"
-    },
-    "koboldcpp": {
-      "type": "openai_compatible",
-      "api_key_env": "",
-      "base_url": "http://localhost:5001/v1/"
     }
   },
   "model_provider_mapping": {
@@ -36,32 +31,31 @@
     "claude-3-haiku-20240307": "anthropic",
     "meta-llama/Meta-Llama-3-70B-Instruct": "deepinfra",
     "deepseek-chat": "deepseek",
-    "gemini-2.5-flash": "gemini",
-    "Qwen3": "koboldcpp"
+    "gemini-2.5-flash": "gemini"
   },
   "batch_generation": {
-    "num_stories": 15,
-    "model": "Qwen3",
+    "num_stories": 60,
+    "model": "gpt-4o",
     "max_attempts": 3,
     "glicko_initial_rating": 1500,
     "glicko_initial_rd": 350,
     "glicko_initial_volatility": 0.06,
-    "max_concurrent_generations": 1
+    "max_concurrent_generations": 0
   },
   "next_batch_generation": {
-    "top_stories_to_select": 3,
-    "variants_per_story": 3,
-    "model": "Qwen3",
+    "top_stories_to_select": 5,
+    "variants_per_story": 5,
+    "model": "gpt-4o",
     "max_attempts": 3,
     "include_original_stories": true,
     "variant_temperature": 1.2,
-    "max_concurrent_generations": 1
+    "max_concurrent_generations": 0
   },
   "glicko_ranking": {
     "tau": 0.5,
-    "judge_model": "Qwen3",
-    "tournament_rounds": 10,
-    "max_concurrent_matches": 1,
+    "judge_model": "gpt-4o",
+    "tournament_rounds": 20,
+    "max_concurrent_matches": 60,
     "save_match_history": true,
     "update_rankings_after_each_round": true
   },
