@@ -61,8 +61,6 @@
   },
   "evolution_pipeline": {
     "max_iterations": 5,
-    "generate_final_batch": true,
-    "auto_continue_from_existing": true,
     "log_level": "INFO"
   },
   "input_files": {
@@ -71,9 +69,6 @@
   },
   "output": {
     "directory": "output",
-    "stories_file": "initial_stories.json",
-    "next_batch_file": "batch2_stories.json",
-    "elo_results_file": "glicko_rankings.json",
-    "match_history_file": "match_history.json"
+    "database_file": "alphaevolve.db"
   }
 }

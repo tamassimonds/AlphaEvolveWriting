@@ -13,9 +13,9 @@ import json
 import os
 import sys
 import time
+import sqlite3
 from datetime import datetime
 from typing import Dict, Any, List
-import glob
 
 from ..generators.story_generator import InitialStoryGenerator, NextBatchGenerator
 from ..rankers.tournament_runner import TournamentRunner
@@ -24,18 +24,21 @@ from ..rankers.tournament_runner import TournamentRunner
 class EvolutionPipeline:
     """Manages the automated story evolution pipeline."""
     
-    def __init__(self, config_file: str = "config.json"):
+    def __init__(self, config_file: str = "config.json", db_connection: sqlite3.Connection = None):
         """
         Initialize the evolution pipeline.
         
         Args:
             config_file: Path to the configuration file
+            db_connection: An active sqlite3 connection object
         """
         self.config_file = config_file
         self.config = self.load_config()
+        if db_connection is None:
+            raise ValueError("A database connection must be provided to EvolutionPipeline.")
+        self.conn = db_connection
         self.iteration = 0
         self.start_time = None
-        self.existing_batches = self.detect_existing_batches()
         self.stats = {
             "iterations_completed": 0,
             "total_stories_generated": 0,
@@ -49,60 +52,16 @@ class EvolutionPipeline:
         """Load configuration from file."""
         with open(self.config_file, "r") as f:
             return json.load(f)
-    
-    def detect_existing_batches(self) -> List[str]:
-        """
-        Detect existing story batch files in the output directory.
-        
-        Returns:
-            List of existing batch file paths, sorted by creation/modification time
-        """
-        try:
-            output_dir = self.config["output"]["directory"]
-            
-            batch_patterns = [
-                os.path.join(output_dir, "initial_stories.json"),
-                os.path.join(output_dir, "batch*_stories.json"),
-                os.path.join(output_dir, "*stories.json")
-            ]
-            
-            all_batch_files = []
-            for pattern in batch_patterns:
-                files = glob.glob(pattern)
-                all_batch_files.extend(files)
-            
-            all_batch_files = list(set(all_batch_files))
-            all_batch_files.sort(key=lambda f: os.path.getmtime(f))
-            
-            return all_batch_files
-            
-        except Exception as e:
-            self.log(f"Warning: Could not detect existing batches: {e}", "WARN")
-            return []
-    
+
     def get_latest_batch_number(self) -> int:
-        """
-        Get the number of the latest batch.
-        
-        Returns:
-            The batch number (0 if no batches exist, 1 for initial, 2+ for batch2, etc.)
-        """
-        if not self.existing_batches:
-            return 0
-        
-        latest_batch = self.existing_batches[-1]
-        filename = os.path.basename(latest_batch)
-        
-        if "initial_stories.json" in filename:
-            return 1
-        elif "batch" in filename:
-            import re
-            match = re.search(r'batch(\d+)_stories\.json', filename)
-            if match:
-                return int(match.group(1))
-        
-        return 1
-    
+        """Get the number of the latest batch from the database."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT MAX(batch_number) FROM stories")
+        result = cursor.fetchone()
+        if result and result[0] is not None:
+            return int(result[0])
+        return -1  # Use -1 to indicate no batches exist
+
     def log(self, message: str, level: str = "INFO"):
         """Log a message with timestamp."""
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -111,33 +70,37 @@ class EvolutionPipeline:
     def log_iteration_start(self, iteration: int):
         """Log the start of an iteration."""
         self.log("=" * 80)
-        self.log(f"🚀 STARTING ITERATION {iteration}")
+        self.log(f"🚀 STARTING EVOLUTION CYCLE {iteration}")
         self.log("=" * 80)
     
     def log_iteration_end(self, iteration: int, duration: float):
         """Log the end of an iteration."""
-        self.log(f"✅ ITERATION {iteration} COMPLETED in {duration:.1f}s")
+        self.log(f"✅ EVOLUTION CYCLE {iteration} COMPLETED in {duration:.1f}s")
         self.log("=" * 80)
     
     def log_pipeline_summary(self):
         """Log final pipeline statistics."""
+        if not self.start_time:
+            self.log("Pipeline did not run, no summary to show.")
+            return
+
         total_time = time.time() - self.start_time
         avg_iteration_time = sum(self.stats["iteration_times"]) / len(self.stats["iteration_times"]) if self.stats["iteration_times"] else 0
         
         self.log("\n" + "=" * 80)
         self.log("🏁 EVOLUTION PIPELINE COMPLETED")
         self.log("=" * 80)
-        self.log(f"Total iterations: {self.stats['iterations_completed']}")
+        self.log(f"Total evolution cycles: {self.stats['iterations_completed']}")
         self.log(f"Total stories generated: {self.stats['total_stories_generated']}")
         self.log(f"Total time: {total_time:.1f}s ({total_time/60:.1f}m)")
-        self.log(f"Average iteration time: {avg_iteration_time:.1f}s")
+        self.log(f"Average cycle time: {avg_iteration_time:.1f}s")
         self.log("=" * 80)
     
     async def run_initial_generation(self) -> bool:
         """Run initial story generation."""
         self.log("📝 Step 1: Generating initial batch of stories...")
         try:
-            generator = InitialStoryGenerator(self.config)
+            generator = InitialStoryGenerator(self.config, self.conn)
             stories = await generator.generate_batch()
             
             self.stats["total_stories_generated"] += len(stories)
@@ -152,7 +115,7 @@ class EvolutionPipeline:
         """Run Glicko-2 tournament."""
         self.log("🏆 Step 2: Running Glicko-2 tournament...")
         try:
-            runner = TournamentRunner(self.config)
+            runner = TournamentRunner(self.config, self.conn)
             matches_played = await runner.run_tournament()
             
             self.stats["total_matches_played"] += matches_played
@@ -165,9 +128,9 @@ class EvolutionPipeline:
     
     async def run_next_generation(self) -> bool:
         """Generate next batch of stories."""
-        self.log("🧬 Step 3: Generating next batch from top performers...")
+        self.log("🧬 Step 1: Generating next batch from top performers...")
         try:
-            generator = NextBatchGenerator(self.config)
+            generator = NextBatchGenerator(self.config, self.conn)
             stories = await generator.generate_batch()
             
             self.stats["total_stories_generated"] += len(stories)
@@ -178,45 +141,87 @@ class EvolutionPipeline:
             self.log(f"❌ Failed to generate next batch: {e}", "ERROR")
             return False
     
-    async def run_iteration(self, iteration: int, skip_initial: bool = False) -> bool:
+    async def export_top_stories(self, top_n: int = 5):
         """
-        Run a single iteration of the evolution pipeline.
-        
-        Args:
-            iteration: Current iteration number
-            skip_initial: Whether to skip initial generation (if batches already exist)
+        Queries the final batch, selects the top N stories by rating, and saves
+        them to human-readable text files.
+        """
+        try:
+            output_dir = self.config["output"]["directory"]
+            os.makedirs(output_dir, exist_ok=True)
+
+            latest_batch_num = self.get_latest_batch_number()
+            if latest_batch_num == -1:
+                self.log("No batches found to export from.", "WARN")
+                return
+
+            self.log(f"Fetching top {top_n} stories from final batch ({latest_batch_num})...")
+
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT story_id, piece, rating, model_used, wins, losses, matches_played
+                FROM stories
+                WHERE batch_number = ?
+                ORDER BY rating DESC
+                LIMIT ?
+            """, (latest_batch_num, top_n))
             
-        Returns:
-            True if iteration completed successfully
-        """
-        iteration_start = time.time()
-        self.log_iteration_start(iteration)
-        
-        if iteration == 1 and not skip_initial:
-            if not await self.run_initial_generation():
-                return False
-        elif iteration == 1 and skip_initial:
-            self.log("⏭️  Skipping initial generation - using existing batches")
-        
-        if not await self.run_tournament():
-            return False
-        
-        iteration_time = time.time() - iteration_start
-        self.stats["iteration_times"].append(iteration_time)
-        self.log_iteration_end(iteration, iteration_time)
-        
-        return True
-    
-    async def run_pipeline(self, max_iterations: int = None, generate_final_batch: bool = None) -> bool:
+            top_stories = cursor.fetchall()
+
+            if not top_stories:
+                self.log(f"No stories found in batch {latest_batch_num} to export.", "WARN")
+                return
+
+            for i, story_row in enumerate(top_stories):
+                rank = i + 1
+                story = dict(story_row)
+                
+                # The text from the database is a standard Python string.
+                # Special characters like \u2019 are already decoded.
+                # We just need to write it to a file with UTF-8 encoding
+                # to preserve all characters correctly.
+                clean_piece = story['piece']
+
+                header = (
+                    f"--- AlphaEvolve Top Story ---\n"
+                    f"Rank: {rank}\n"
+                    f"Rating: {story['rating']:.1f}\n"
+                    f"Record (W/L): {story['wins']}/{story['losses']} ({story['matches_played']} matches)\n"
+                    f"Model: {story['model_used']}\n"
+                    f"Story ID: {story['story_id']}\n"
+                    f"-----------------------------\n\n"
+                )
+                
+                file_content = header + clean_piece
+                
+                filename = f"rank_{rank}_story.txt"
+                filepath = os.path.join(output_dir, filename)
+
+                try:
+                    with open(filepath, "w", encoding="utf-8") as f:
+                        f.write(file_content)
+                    self.log(f"  -> Saved Rank {rank} story to {filepath}")
+                except Exception as e:
+                    self.log(f"Failed to write file {filepath}: {e}", "ERROR")
+
+            self.log(f"✅ Successfully exported top {len(top_stories)} stories.")
+
+        except Exception as e:
+            self.log(f"❌ Failed to export top stories: {e}", "ERROR")
+
+    async def run_pipeline(self, max_iterations: int = None) -> bool:
         """
         Run the complete evolution pipeline.
         
+        The pipeline consists of a one-time setup phase (initial generation +
+        initial tournament), followed by N evolution cycles (next generation -> tournament).
+
         Args:
-            max_iterations: Maximum number of iterations to run (overrides config if provided)
-            generate_final_batch: Whether to generate a final batch after the last tournament (overrides config if provided)
+            max_iterations: Maximum number of evolution cycles to run (overrides config if provided).
+                            An iteration is one step of generation + tournament.
             
         Returns:
-            True if pipeline completed successfully
+            True if pipeline completed successfully.
         """
         self.start_time = time.time()
         self.stats["pipeline_start_time"] = datetime.now().isoformat()
@@ -225,41 +230,60 @@ class EvolutionPipeline:
         
         if max_iterations is None:
             max_iterations = pipeline_config.get("max_iterations", 3)
-        if generate_final_batch is None:
-            generate_final_batch = pipeline_config.get("generate_final_batch", True)
         
-        auto_continue = pipeline_config.get("auto_continue_from_existing", True)
-        latest_batch_number = self.get_latest_batch_number()
+        start_batch_number = self.get_latest_batch_number()
         
-        self.log(f"🧬 Starting Evolution Pipeline with {max_iterations} iterations")
+        self.log(f"🧬 Starting Evolution Pipeline for {max_iterations} evolution cycles.")
         self.log(f"Configuration: {self.config['batch_generation']['num_stories']} stories per batch")
         self.log(f"Tournament: {self.config['glicko_ranking']['tournament_rounds']} rounds per tournament")
         
-        if self.existing_batches:
-            self.log(f"📁 Found {len(self.existing_batches)} existing batch(es)")
-            for i, batch_file in enumerate(self.existing_batches):
-                filename = os.path.basename(batch_file)
-                mtime = datetime.fromtimestamp(os.path.getmtime(batch_file)).strftime("%Y-%m-%d %H:%M:%S")
-                self.log(f"  {i+1}. {filename} (modified: {mtime})")
-            self.log(f"🔄 Continuing evolution from batch {latest_batch_number}")
+        # --- Initial Setup ---
+        if start_batch_number == -1:
+            self.log("📝 No existing batches found in DB. Performing initial setup...")
+            
+            # Step 1: Initial Generation
+            self.log("--- SETUP STEP 1 of 2: Initial Generation ---")
+            if not await self.run_initial_generation():
+                self.log_pipeline_summary()
+                return False
+            
+            # Step 2: Initial Tournament/Judgement
+            self.log("--- SETUP STEP 2 of 2: Initial Judgement ---")
+            if not await self.run_tournament():
+                self.log_pipeline_summary()
+                return False
+            
+            self.log("✅ Initial setup complete. Starting evolution cycles.")
         else:
-            self.log("📝 No existing batches found - starting fresh")
+            self.log(f"📁 Found existing data up to judged batch {start_batch_number}.")
+            self.log(f"🔄 Continuing evolution from batch {start_batch_number}.")
         
+        # --- Evolution Loop ---
         success = True
-        
-        for iteration in range(1, max_iterations + 1):
-            skip_initial = auto_continue and (latest_batch_number > 0)
-            if not await self.run_iteration(iteration, skip_initial=skip_initial):
+        for i in range(1, max_iterations + 1):
+            iteration_start = time.time()
+            self.log_iteration_start(i)
+            
+            # Each evolution cycle is: Next Generation -> Tournament
+            
+            if not await self.run_next_generation():
                 success = False
                 break
             
-            self.stats["iterations_completed"] = iteration
-            
-            if iteration < max_iterations or generate_final_batch:
-                if not await self.run_next_generation():
-                    success = False
-                    break
+            if not await self.run_tournament():
+                success = False
+                break
+                
+            self.stats["iterations_completed"] = i
+            iteration_time = time.time() - iteration_start
+            self.stats["iteration_times"].append(iteration_time)
+            self.log_iteration_end(i, iteration_time)
         
+        # --- Final Export ---
+        if success:
+            self.log("🏅 Exporting final top stories...")
+            await self.export_top_stories()
+
         self.stats["pipeline_end_time"] = datetime.now().isoformat()
         self.log_pipeline_summary()
         

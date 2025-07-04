@@ -15,7 +15,9 @@ import sys
 import os
 import asyncio
 import argparse
+import json
 from src.core.pipeline import EvolutionPipeline
+from src.utils.database import wipe_database, get_db_path, get_connection, create_schema
 
 
 def create_parser():
@@ -30,7 +32,7 @@ def create_parser():
     parser.add_argument(
         "--fresh", 
         action="store_true", 
-        help="Start fresh even if existing batches are found"
+        help="Start fresh by wiping the database before running"
     )
     parser.add_argument(
         "--general", 
@@ -63,21 +65,36 @@ async def main():
     if args.general:
         os.environ['USE_GENERAL_MODE'] = '1'
         print("📝 Using general writing mode")
-    
-    # Initialize pipeline
+
+    # Load config to find DB path
     try:
-        pipeline = EvolutionPipeline(args.config)
+        with open(args.config, "r") as f:
+            config_data = json.load(f)
+        db_path = get_db_path(config_data)
     except FileNotFoundError:
         print(f"❌ Config file not found: {args.config}")
         return 1
     except Exception as e:
         print(f"❌ Error loading config: {e}")
         return 1
-    
-    # Handle fresh start
+
+    # Handle fresh start by wiping the DB
     if args.fresh:
-        pipeline.existing_batches = []
-        print("🔄 Fresh start requested")
+        print(f"🔄 --fresh start requested, wiping database at {db_path}...")
+        wipe_database(db_path)
+        print(f"✅ Database wiped and re-initialized.")
+
+    # Initialize DB connection and schema
+    conn = get_connection(db_path)
+    create_schema(conn)
+
+    # Initialize pipeline
+    try:
+        pipeline = EvolutionPipeline(config_file=args.config, db_connection=conn)
+    except Exception as e:
+        print(f"❌ Error initializing pipeline: {e}")
+        conn.close()
+        return 1
     
     # Determine iterations
     if args.iterations is not None:
@@ -106,6 +123,9 @@ async def main():
     except Exception as e:
         print(f"\n💥 Evolution failed with error: {e}")
         return 1
+    finally:
+        print("Closing database connection.")
+        conn.close()
 
 
 if __name__ == "__main__":

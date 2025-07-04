@@ -13,6 +13,7 @@ import gc
 import psutil
 import os
 import math
+import sqlite3
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 from dataclasses import dataclass, field
@@ -63,13 +64,15 @@ class Story:
 class GlickoRankingSystem:
     """Glicko-2 ranking system for creative writing stories."""
     
-    def __init__(self, tau: float = 0.5):
+    def __init__(self, config: Dict[str, Any], tau: float = 0.5):
         """
         Initialize the Glicko-2 ranking system.
         
         Args:
+            config: The main configuration dictionary.
             tau: System constant, determines expected change in volatility over time.
         """
+        self.config = config
         self.tau = tau
         self.match_history: List[Dict[str, Any]] = []
 
@@ -192,8 +195,8 @@ class GlickoRankingSystem:
                 pairs.append((story1, story2))
         return pairs
 
-    def _process_rating_period(self, stories: List[Story], results: List[MatchResult]):
-        """Update all player ratings after a rating period is complete."""
+    def _process_rating_period(self, conn: sqlite3.Connection, stories: List[Story], results: List[MatchResult]):
+        """Update all player ratings and save matches to the database."""
         print("\n📊 Processing Glicko-2 rating period updates...")
         
         match_data = {story.story_id: {'opponents': [], 'outcomes': []} for story in stories}
@@ -210,8 +213,9 @@ class GlickoRankingSystem:
         for story_id, data in match_data.items():
             self._update_player(story_map[story_id], data['opponents'], data['outcomes'])
         
+        matches_to_insert = []
         for res in results:
-            self.match_history.append({
+            match_info = {
                 "story1_id": res.story1.story_id,
                 "story2_id": res.story2.story_id,
                 "winner_id": res.winner.story_id,
@@ -221,10 +225,23 @@ class GlickoRankingSystem:
                 "story2_rating_after": story_map[res.story2.story_id].rating,
                 "reasoning": res.reasoning,
                 "timestamp": res.timestamp
-            })
+            }
+            matches_to_insert.append(tuple(match_info.values()))
+            self.match_history.append(match_info)
+        
+        if matches_to_insert and self.config.get("glicko_ranking", {}).get("save_match_history", True):
+            cursor = conn.cursor()
+            cursor.executemany("""
+                INSERT INTO matches (story1_id, story2_id, winner_id, story1_rating_before, story2_rating_before,
+                                     story1_rating_after, story2_rating_after, reasoning, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, matches_to_insert)
+            conn.commit()
+            print(f"💾 Saved {len(matches_to_insert)} match results to the database.")
 
     async def run_tournament(
         self,
+        conn: sqlite3.Connection,
         stories: List[Story],
         num_rounds: int,
         judge_model: str,
@@ -262,7 +279,7 @@ class GlickoRankingSystem:
                     successful_matches += 1
             print(f"   📊 Batch {batch_num} summary: {successful_matches}/{len(batch)} matches successful")
         
-        self._process_rating_period(stories, all_match_results)
+        self._process_rating_period(conn, stories, all_match_results)
         
         print(f"Tournament complete! {len(all_match_results)} matches played")
         return len(all_match_results)
@@ -286,43 +303,27 @@ class GlickoRankingSystem:
             })
         return leaderboard
 
-    def save_results(self, stories: List[Story], output_dir: str, results_file: str, history_file: str, save_history: bool = True):
-        """Save tournament results to files."""
-        os.makedirs(output_dir, exist_ok=True)
-        leaderboard = self.get_leaderboard(stories)
-        
-        results_data = {
-            "tournament_completed_at": datetime.now().isoformat(),
-            "total_matches": len(self.match_history),
-            "leaderboard": leaderboard
-        }
-        with open(os.path.join(output_dir, results_file), "w") as f:
-            json.dump(results_data, f, indent=2)
-        print(f"Glicko results saved to: {os.path.join(output_dir, results_file)}")
-        
-        if save_history:
-            with open(os.path.join(output_dir, history_file), "w") as f:
-                json.dump({"matches": self.match_history}, f, indent=2)
-            print(f"Match history saved to: {os.path.join(output_dir, history_file)}")
 
-def load_stories_from_json(json_path: str, default_rating: float, default_rd: float, default_sigma: float) -> List[Story]:
-    """Load stories from JSON, converting to Story objects with Glicko parameters."""
-    with open(json_path, "r") as f:
-        data = json.load(f)
+def load_stories_from_db(conn: sqlite3.Connection, batch_number: int) -> List[Story]:
+    """Load stories from database, converting to Story objects with Glicko parameters."""
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM stories WHERE batch_number = ?", (batch_number,))
+    rows = cursor.fetchall()
     
     stories = []
-    for story_data in data.get("stories", []):
+    for story_data in rows:
+        story_dict = dict(story_data)
         story = Story(
-            story_id=story_data["story_id"],
-            piece=story_data["piece"],
-            model_used=story_data["model_used"],
-            rating=story_data.get("rating", story_data.get("elo", default_rating)),
-            rd=story_data.get("rd", default_rd),
-            sigma=story_data.get("sigma", default_sigma),
-            previous_batch_rating=story_data.get("previous_batch_rating"),
-            matches_played=story_data.get("matches_played", 0),
-            wins=story_data.get("wins", 0),
-            losses=story_data.get("losses", 0)
+            story_id=story_dict["story_id"],
+            piece=story_dict["piece"],
+            model_used=story_dict["model_used"],
+            rating=story_dict.get("rating", 1500.0),
+            rd=story_dict.get("rd", 350.0),
+            sigma=story_dict.get("sigma", 0.06),
+            previous_batch_rating=story_dict.get("previous_batch_rating"),
+            matches_played=story_dict.get("matches_played", 0),
+            wins=story_dict.get("wins", 0),
+            losses=story_dict.get("losses", 0)
         )
         stories.append(story)
     return stories
